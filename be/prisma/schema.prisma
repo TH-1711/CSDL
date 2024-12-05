@@ -1,0 +1,363 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model booking {
+  order_id    Int            @id @db.UnsignedInt
+  pickup_date DateTime?      @db.Date
+  state       booking_state? @default(Processing)
+  paid        booking_paid?  @default(Not_paid)
+  orders      orders         @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_booking_order")
+}
+
+model catalog {
+  id                 Int                  @id @db.UnsignedInt
+  name               String               @unique(map: "name") @db.VarChar(255)
+  catalog_in_store   catalog_in_store[]
+  product_in_catalog product_in_catalog[]
+}
+
+model catalog_in_store {
+  catalog_id Int     @db.UnsignedInt
+  store_id   Int     @db.UnsignedInt
+  catalog    catalog @relation(fields: [catalog_id], references: [id], onDelete: Cascade, map: "FK_catalog_store")
+  store      store   @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "FK_store_catalog")
+
+  @@id([catalog_id, store_id])
+  @@index([store_id], map: "FK_store_catalog")
+}
+
+model customer {
+  id                Int                 @id @default(autoincrement()) @db.UnsignedInt
+  fullname          String              @db.VarChar(255)
+  phone_number      String?             @db.Char(10)
+  email             String?             @db.VarChar(255)
+  city              String?             @db.VarChar(255)
+  current_point     Int?                @default(0) @db.UnsignedInt
+  exchanged_voucher exchanged_voucher[]
+  membership        membership?
+  orders            orders[]
+}
+
+model detail_report {
+  report_id                                                   String          @db.VarChar(255)
+  variation_id                                                String          @db.VarChar(255)
+  color                                                       String          @db.VarChar(255)
+  variation_color_detail_report_colorTovariation_color        variation_color @relation("detail_report_colorTovariation_color", fields: [color], references: [color], onDelete: Cascade, onUpdate: NoAction, map: "FK_dtrp_color")
+  report                                                      report          @relation(fields: [report_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dtrp_report")
+  variation_color_detail_report_variation_idTovariation_color variation_color @relation("detail_report_variation_idTovariation_color", fields: [variation_id], references: [variation_id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dtrp_variation")
+
+  @@id([report_id, variation_id, color])
+  @@index([color], map: "FK_dtrp_color")
+  @@index([variation_id], map: "FK_dtrp_variation")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model employee {
+  id                               Int        @id @db.UnsignedInt
+  firstname                        String     @db.VarChar(255)
+  lastname                         String     @db.VarChar(255)
+  gender                           String     @db.VarChar(20)
+  phone_number                     String     @db.Char(10)
+  city                             String     @db.VarChar(255)
+  street                           String     @db.VarChar(255)
+  shift                            String     @db.VarChar(255)
+  start_date                       DateTime   @db.Date
+  office                           String     @db.VarChar(255)
+  salary                           Int?       @default(0) @db.UnsignedInt
+  store_id                         Int?       @db.UnsignedInt
+  supervisor                       Int?       @db.UnsignedInt
+  store_employee_store_idTostore   store?     @relation("employee_store_idTostore", fields: [store_id], references: [id], map: "fk_employee_store")
+  employee                         employee?  @relation("employeeToemployee", fields: [supervisor], references: [id], map: "fk_supervisor")
+  other_employee                   employee[] @relation("employeeToemployee")
+  orders                           orders[]
+  store_store_manager_idToemployee store[]    @relation("store_manager_idToemployee")
+
+  @@index([store_id], map: "fk_employee_store")
+  @@index([supervisor], map: "fk_supervisor")
+}
+
+model exchanged_voucher {
+  voucher_id  Int      @db.UnsignedInt
+  customer_id Int      @db.UnsignedInt
+  customer    customer @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "FK_exchanged_voucher_customer")
+  voucher     voucher  @relation(fields: [voucher_id], references: [id], onDelete: Cascade, map: "FK_exchanged_voucher_voucher")
+
+  @@id([voucher_id, customer_id])
+  @@index([customer_id], map: "FK_exchanged_voucher_customer")
+}
+
+model membership {
+  customer_id Int                   @id @db.UnsignedInt
+  register    DateTime              @db.Date
+  points      Int?                  @default(0) @db.UnsignedInt
+  card_type   membership_card_type? @default(silver)
+  customer    customer              @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "membership_ibfk_1")
+}
+
+model order_detail {
+  order_id                                                   Int             @db.UnsignedInt
+  variation_id                                               String          @db.VarChar(255)
+  color                                                      String          @db.VarChar(255)
+  quantity                                                   Int?            @default(0) @db.UnsignedInt
+  variation_color_order_detail_colorTovariation_color        variation_color @relation("order_detail_colorTovariation_color", fields: [color], references: [color], onDelete: Cascade, onUpdate: NoAction, map: "FK_detail_color")
+  orders                                                     orders          @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_detail_order")
+  variation_color_order_detail_variation_idTovariation_color variation_color @relation("order_detail_variation_idTovariation_color", fields: [variation_id], references: [variation_id], onDelete: Cascade, onUpdate: NoAction, map: "FK_detail_variation")
+
+  @@id([order_id, variation_id, color])
+  @@index([color], map: "FK_detail_color")
+  @@index([variation_id], map: "FK_detail_variation")
+}
+
+model orders {
+  id               Int               @id @default(autoincrement()) @db.UnsignedInt
+  order_date       DateTime          @db.Date
+  conversion_point Int?              @default(0) @db.UnsignedInt
+  total_value      Decimal           @db.Decimal(10, 2)
+  store_id         Int               @db.UnsignedInt
+  processor        Int?              @db.UnsignedInt
+  voucher_id       Int?              @db.UnsignedInt
+  customer_id      Int?              @db.UnsignedInt
+  order_type       orders_order_type
+  booking          booking?
+  order_detail     order_detail[]
+  customer         customer?         @relation(fields: [customer_id], references: [id], onUpdate: NoAction, map: "FK_oderrs_customer")
+  employee         employee?         @relation(fields: [processor], references: [id], onUpdate: NoAction, map: "FK_orders_employee")
+  store            store             @relation(fields: [store_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_orders_store")
+  voucher          voucher?          @relation(fields: [voucher_id], references: [id], onUpdate: NoAction, map: "FK_orders_voucher")
+  receipt          receipt?
+
+  @@index([customer_id], map: "FK_oderrs_customer")
+  @@index([processor], map: "FK_orders_employee")
+  @@index([store_id], map: "FK_orders_store")
+  @@index([voucher_id], map: "FK_orders_voucher")
+}
+
+model product {
+  id                    Int                 @id @db.UnsignedInt
+  name                  String              @db.VarChar(255)
+  description           String?             @db.VarChar(255)
+  discount_for_employee Int?                @default(0) @db.UnsignedInt
+  product_in_catalog    product_in_catalog?
+  product_variation     product_variation[]
+  promotion_product     promotion_product[]
+}
+
+model product_in_catalog {
+  catalog_id Int?     @db.UnsignedInt
+  product_id Int      @id @db.UnsignedInt
+  catalog    catalog? @relation(fields: [catalog_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_PIC_catalog")
+  product    product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_PIC_product")
+
+  @@index([catalog_id], map: "FK_PIC_catalog")
+}
+
+model product_variation {
+  id              String                 @id @db.VarChar(255)
+  origin_price    Int?                   @default(0) @db.UnsignedInt
+  sell_price      Int?                   @default(0) @db.UnsignedInt
+  size            product_variation_size @default(D)
+  product_id      Int?                   @db.UnsignedInt
+  product         product?               @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_variation_product")
+  variation_color variation_color[]
+
+  @@index([product_id], map: "FK_variation_product")
+}
+
+model promotion {
+  id                Int                 @id @db.UnsignedInt
+  content           String?             @db.VarChar(255)
+  start_date        DateTime            @db.Date
+  end_date          DateTime            @db.Date
+  promotion_product promotion_product[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model promotion_product {
+  product_id    Int       @db.UnsignedInt
+  promotion_id  Int       @db.UnsignedInt
+  discount_rate Int?      @default(0) @db.UnsignedInt
+  use_condition String?   @db.VarChar(255)
+  product       product   @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "promotion_product_ibfk_1")
+  promotion     promotion @relation(fields: [promotion_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "promotion_product_ibfk_2")
+
+  @@id([product_id, promotion_id])
+  @@index([promotion_id], map: "promotion_id")
+}
+
+model provided_product {
+  provider_id                                                    Int             @db.UnsignedInt
+  variation_id                                                   String          @db.VarChar(255)
+  color                                                          String          @db.VarChar(255)
+  quantity                                                       Int?            @default(0) @db.UnsignedInt
+  discount                                                       Int?            @default(0) @db.UnsignedInt
+  variation_color_provided_product_colorTovariation_color        variation_color @relation("provided_product_colorTovariation_color", fields: [color], references: [color], onDelete: NoAction, map: "FK_PP_color")
+  provider                                                       provider        @relation(fields: [provider_id], references: [id], onDelete: NoAction, map: "FK_PP_provider")
+  variation_color_provided_product_variation_idTovariation_color variation_color @relation("provided_product_variation_idTovariation_color", fields: [variation_id], references: [variation_id], onDelete: NoAction, map: "FK_PP_variation")
+
+  @@id([provider_id, variation_id, color])
+  @@index([color], map: "FK_PP_color")
+  @@index([variation_id], map: "FK_PP_variation")
+}
+
+model provider {
+  id               Int                @id @default(autoincrement()) @db.UnsignedInt
+  name             String?            @unique(map: "name") @db.VarChar(255)
+  hotline          String?            @db.VarChar(255)
+  email            String?            @db.VarChar(255)
+  provided_product provided_product[]
+}
+
+model receipt {
+  order_id   Int       @id @db.UnsignedInt
+  order_time DateTime? @default(now()) @db.Timestamp(0)
+  orders     orders    @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_receipt_order")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model report {
+  id            String          @id @db.VarChar(255)
+  name          String?         @db.VarChar(255)
+  rp_date       Int?
+  rp_month      Int?
+  rp_year       Int?
+  rp_type       report_rp_type?
+  warehouse_id  Int?            @db.UnsignedInt
+  detail_report detail_report[]
+  warehouse     warehouse?      @relation(fields: [warehouse_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_report_warehouse")
+
+  @@index([warehouse_id], map: "FK_report_warehouse")
+}
+
+model revenue {
+  id               Int      @id @default(autoincrement()) @db.UnsignedInt
+  month            Int
+  year             Int
+  last_update      DateTime @db.Date
+  note             String?  @db.VarChar(255)
+  title            String?  @db.VarChar(255)
+  number_of_orders Int?     @db.UnsignedInt
+  store_id         Int?     @db.UnsignedInt
+  store            store?   @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "FK_revenue_store")
+
+  @@index([store_id], map: "FK_revenue_store")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model store {
+  id                                  Int                  @id @db.UnsignedInt
+  name                                String               @db.VarChar(255)
+  city                                String               @db.VarChar(255)
+  street                              String               @db.VarChar(255)
+  email                               String?              @db.VarChar(255)
+  phone_number                        String               @db.Char(10)
+  number_of_emps                      Int?                 @default(0) @db.UnsignedInt
+  manager_id                          Int?                 @db.UnsignedInt
+  catalog_in_store                    catalog_in_store[]
+  employee_employee_store_idTostore   employee[]           @relation("employee_store_idTostore")
+  orders                              orders[]
+  revenue                             revenue[]
+  employee_store_manager_idToemployee employee?            @relation("store_manager_idToemployee", fields: [manager_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_store_employee")
+  variation_in_store                  variation_in_store[]
+  voucher                             voucher[]
+  warehouse                           warehouse[]
+
+  @@index([manager_id], map: "FK_store_employee")
+}
+
+model variation_color {
+  color                                                           String    @unique    @db.VarChar(255)
+  variation_id                                                    String    @unique    @db.VarChar(255)
+  detail_report_detail_report_colorTovariation_color              detail_report[]      @relation("detail_report_colorTovariation_color")
+  detail_report_detail_report_variation_idTovariation_color       detail_report[]      @relation("detail_report_variation_idTovariation_color")
+  order_detail_order_detail_colorTovariation_color                order_detail[]       @relation("order_detail_colorTovariation_color")
+  order_detail_order_detail_variation_idTovariation_color         order_detail[]       @relation("order_detail_variation_idTovariation_color")
+  provided_product_provided_product_colorTovariation_color        provided_product[]   @relation("provided_product_colorTovariation_color")
+  provided_product_provided_product_variation_idTovariation_color provided_product[]   @relation("provided_product_variation_idTovariation_color")
+  product_variation                                               product_variation    @relation(fields: [variation_id], references: [id], onDelete: Cascade, map: "FK_color_variation")
+  variation_in_store                                              variation_in_store[]
+
+  @@id([color, variation_id])
+  @@index([variation_id], map: "FK_color_variation")
+}
+
+model variation_in_store {
+  variation_id    String          @db.VarChar(255)
+  store_id        Int             @db.UnsignedInt
+  color           String          @db.VarChar(255)
+  quantity        Int?            @default(0) @db.UnsignedInt
+  variation_color variation_color @relation(fields: [color, variation_id], references: [color, variation_id], onDelete: Cascade, map: "FK_color_in_store_color")
+  store           store           @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "FK_color_in_store_store")
+
+  @@id([variation_id, store_id, color])
+  @@index([color, variation_id], map: "FK_color_in_store_color")
+  @@index([store_id], map: "FK_color_in_store_store")
+}
+
+model voucher {
+  id                Int                 @id @default(autoincrement()) @db.UnsignedInt
+  point_need        Int?                @default(0) @db.UnsignedInt
+  discount          Int?                @default(0) @db.UnsignedInt
+  store_id          Int?                @db.UnsignedInt
+  exchanged_voucher exchanged_voucher[]
+  orders            orders[]
+  store             store?              @relation(fields: [store_id], references: [id], onDelete: Cascade, map: "FK_voucher_store")
+
+  @@index([store_id], map: "FK_voucher_store")
+}
+
+model warehouse {
+  id       Int                @id @default(autoincrement()) @db.UnsignedInt
+  street   String?            @db.VarChar(255)
+  city     String?            @db.VarChar(255)
+  store_id Int?               @db.UnsignedInt
+  classify warehouse_classify
+  report   report[]
+  store    store?             @relation(fields: [store_id], references: [id], map: "FK_warehouse_store")
+
+  @@index([store_id], map: "FK_warehouse_store")
+}
+
+enum booking_state {
+  Processing
+  Ready
+  Picked_up  @map("Picked-up")
+}
+
+enum booking_paid {
+  Not_paid @map("Not paid")
+  Paid
+}
+
+enum membership_card_type {
+  silver
+  gold
+  platinum
+}
+
+enum product_variation_size {
+  S
+  M
+  L
+  D
+}
+
+enum warehouse_classify {
+  at_store
+  out_store
+}
+
+enum report_rp_type {
+  import
+  export
+}
+
+enum orders_order_type {
+  booking
+  receipt
+}
