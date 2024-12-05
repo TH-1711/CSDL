@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFD1DC; /* Hồng nhạt */
+            box-sizing: border-box;
+        }
+
+        /* Header Styling */
+        .header {
+            background: rgb(179, 231, 235);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 30px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .logo {
+            width: 100px;
+            height: 50px;
+            background: rgb(179, 231, 235);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000103;
+            margin-right: 20px; /* Space between logo and title */
+
+        }
+
+        .header h1 {
+            font-size: 45px; /* Tăng kích thước font để thu hút hơn */
+            color: #000103; /* Màu chữ */
+            margin: 0;
+            margin-right: 20px; /* Khoảng cách giữa logo và tiêu đề */
+            font-family: 'Dancing Script', cursive; /* Sử dụng font nghệ thuật */
+            font-weight: 700; /* Tăng độ dày của chữ */
+        }
+
+
+        .header .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end; /* Align buttons to the right */
+            margin-right: 70px; /* Adds space from the right edge */
+        }
+
+        .header .buttons button {
+            background: white;
+            color: #000103;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .header .buttons button:hover {
+            background: #FF6347;
+            color: white;
+        }
+
+        /* Container to ensure spacing below fixed header */
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 0; /* Added margin-top to avoid overlap with header */
+            padding: 20px;
+        }
+
+        /* Grid for Product List */
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Two columns by default */
+            gap: 20px;
+        }
+
+        /* Product Item Styling */
+        .product-item {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .product-item:hover {
+            transform: scale(1.05);
+        }
+
+        .product-item img {
+            width: 90%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .product-item h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .variant {
+            margin-bottom: 10px;
+        }
+
+        .variant span {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .variant span:hover {
+            background: #ddd;
+        }
+
+        .modal-close {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #FF7F50;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            background: #FF6347;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-list {
+                grid-template-columns: 1fr; /* One column on smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="images/hcmut.png" alt="Product Image">
+
+        </div>
+        <h1> HCMUT Fashion Shop</h1>
+        <div class="buttons">
+            <button onclick="location.href='products.html'">Products</button>
+            <button onclick="location.href='discount.html'">Discount</button>
+            <button onclick="location.href='revenue.html'">Revenue</button>
+
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        <div class="product-list">
+            <div class="product-item" onclick="openModal('Product 1')">
+                <img src="images/jeans1.png" alt="Product Image">
+                <h3>Product 1</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 2')">
+                <img src="images/joggers1.png" alt="Product Image">
+                <h3>Product 2</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 3')">
+                <img src="images/shirt1.png" alt="Product Image">
+                <h3>Product 3</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 4')">
+                <img src="images/jeans2.png" alt="Product Image">
+                <h3>Product 4</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 5')">
+                <img src="images/joggers2.png" alt="Product Image">
+                <h3>Product 5</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 6')">
+                <img src="images/shirt2.png" alt="Product Image">
+                <h3>Product 6</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 7')">
+                <img src="images/jeans3.png" alt="Product Image">
+                <h3>Product 7</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 8')">
+                <img src="images/joggers3.png" alt="Product Image">
+                <h3>Product 8</h3>
+            </div>
+            <div class="product-item" onclick="openModal('Product 9')">
+                <img src="images/shirt3.png" alt="Product Image">
+                <h3>Product 9</h3>
+            </div>
+        </div>
+    </div>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Product</h3>
+            <div class="variant">
+                <strong>Colors:</strong>
+                <span>Red</span>
+                <span>Blue</span>
+                <span>Green</span>
+            </div>
+            <div class="variant">
+                <strong>Sizes:</strong>
+                <span>S</span>
+                <span>M</span>
+                <span>L</span>
+            </div>
+            <p><strong>Price:</strong> $99.99</p>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(productName) {
+            document.getElementById('modalTitle').textContent = productName;
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

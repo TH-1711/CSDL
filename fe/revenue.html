@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFD1DC;
+            box-sizing: border-box;
+        }
+
+        .header {
+            background: rgb(179, 231, 235);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 30px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .logo {
+            width: 100px;
+            height: 50px;
+            background: rgb(179, 231, 235);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000103;
+            margin-right: 20px;
+        }
+
+        .header h1 {
+            font-size: 45px; /* Tăng kích thước font để thu hút hơn */
+            color: #000103; /* Màu chữ */
+            margin: 0;
+            margin-right: 20px; /* Khoảng cách giữa logo và tiêu đề */
+            font-family: 'Dancing Script', cursive; /* Sử dụng font nghệ thuật */
+            font-weight: 700; /* Tăng độ dày của chữ */
+        }
+
+
+        .header .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-right: 70px;
+        }
+
+        .header .buttons button {
+            background: white;
+            color: #000103;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .header .buttons button:hover {
+            background: #FF6347;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 0;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #FF6347;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 80px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <img src="images/hcmut.png" alt="Product Image">
+        </div>
+        <h1>HCMUT Fashion Shop</h1>
+        <div class="buttons">
+            <button onclick="location.href='products.html'">Products</button>
+            <button onclick="location.href='discount.html'">Discount</button>
+            <button onclick="location.href='revenue.html'">Revenue</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Select Store for Monthly Report</h2>
+        <label for="storeSelector">Choose a store:</label>
+        <select id="storeSelector" onchange="updateReport()">
+            <option value="store1">Store 1</option>
+            <option value="store2">Store 2</option>
+            <option value="store3">Store 3</option>
+        </select>
+
+        <div id="reportContainer">
+            <h2>Monthly Revenue Report - December 2024</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Total Sales</th>
+                        <th>Number of Orders</th>
+                        <th>Average Order Value</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    <!-- Dynamic rows will be added here -->
+                </tbody>
+            </table>
+
+            <h3 id="totalRevenue">Total Revenue for the Month: </h3>
+        </div>
+    </div>
+
+    <script>
+        const reports = {
+            store1: {
+                rows: [
+                    { date: "1st December", sales: "$1200", orders: 30, avgOrder: "$40" },
+                    { date: "2nd December", sales: "$900", orders: 25, avgOrder: "$36" }
+                ],
+                total: "$2100"
+            },
+            store2: {
+                rows: [
+                    { date: "1st December", sales: "$1500", orders: 35, avgOrder: "$42.86" },
+                    { date: "2nd December", sales: "$1700", orders: 40, avgOrder: "$42.5" }
+                ],
+                total: "$3200"
+            },
+            store3: {
+                rows: [
+                    { date: "1st December", sales: "$1000", orders: 28, avgOrder: "$35.71" },
+                    { date: "2nd December", sales: "$800", orders: 22, avgOrder: "$36.36" }
+                ],
+                total: "$1800"
+            }
+        };
+
+        function updateReport() {
+            const storeSelector = document.getElementById("storeSelector");
+            const selectedStore = storeSelector.value;
+            const reportTableBody = document.getElementById("reportTableBody");
+            const totalRevenue = document.getElementById("totalRevenue");
+
+            // Clear current table rows
+            reportTableBody.innerHTML = "";
+
+            // Populate rows for selected store
+            const storeReport = reports[selectedStore];
+            storeReport.rows.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${row.date}</td>
+                    <td>${row.sales}</td>
+                    <td>${row.orders}</td>
+                    <td>${row.avgOrder}</td>
+                `;
+                reportTableBody.appendChild(tr);
+            });
+
+            // Update total revenue
+            totalRevenue.textContent = `Total Revenue for the Month: ${storeReport.total}`;
+        }
+
+        // Initialize with first store's report
+        document.addEventListener("DOMContentLoaded", updateReport);
+    </script>
+
+</body>
+</html>
