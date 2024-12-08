@@ -139,7 +139,6 @@
     </style>
 </head>
 <body>
-
     <div class="header">
         <div class="logo">
             <img src="images/hcmut.png" alt="Product Image">
@@ -194,7 +193,16 @@
                 <thead>
                     <tr>
                         <th>Product Name</th>
-                        <th>Variant </th>
+                        <th>Variant
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Color</th>
+                                        <th>Size</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </th>
                         <th>Quantity Sold</th>
                         <th>Total Revenue</th>
                     </tr>
@@ -205,6 +213,7 @@
             </table>
 
             <h3 id="totalRevenue">Total Revenue: $0</h3>
+            <h3 id="totalOrders">Total Orders: 0</h3>
         </div>
     </div>
 
@@ -229,40 +238,11 @@
                 }
             },
             store2: {
-               '2024': {
-                    '01': [
-                        { product: 'Jeans', variant: 'Red - S', quantity: 10, revenue: 300 },
-                        { product: 'Shirt', variant: 'Blue - M', quantity: 5, revenue: 150 }
-                    ],
-                    '12': [
-                        { product: 'Jeans', variant: 'Blue - M', quantity: 8, revenue: 240 },
-                        { product: 'Shirt', variant: 'Red - L', quantity: 6, revenue: 180 }
-                    ]
-                },
-                '2023': {
-                    '12': [
-                        { product: 'Jeans', variant: 'Black - L', quantity: 7, revenue: 210 },
-                        { product: 'Shirt', variant: 'White - M', quantity: 4, revenue: 120 }
-                    ]
-                }
+               // similar structure like store 1
             },
             store3: {
-                '2024': {
-                    '01': [
-                        { product: 'Jeans', variant: 'Red - S', quantity: 10, revenue: 300 },
-                        { product: 'Shirt', variant: 'Blue - M', quantity: 5, revenue: 150 }
-                    ],
-                    '12': [
-                        { product: 'Jeans', variant: 'Blue - M', quantity: 8, revenue: 240 },
-                        { product: 'Shirt', variant: 'Red - L', quantity: 6, revenue: 180 }
-                    ]
-                },
-                '2023': {
-                    '12': [
-                        { product: 'Jeans', variant: 'Black - L', quantity: 7, revenue: 210 },
-                        { product: 'Shirt', variant: 'White - M', quantity: 4, revenue: 120 }
-                    ]
-                }
+                // similar structure like store 1
+
             }
         };
 
@@ -272,6 +252,7 @@
             const yearSelector = document.getElementById("yearSelector");
             const reportTableBody = document.getElementById("reportTableBody");
             const totalRevenueElem = document.getElementById("totalRevenue");
+            const totalOrdersElem = document.getElementById("totalOrders");
             const reportPeriodElem = document.getElementById("reportPeriod");
 
             const selectedStore = storeSelector.value;
@@ -284,20 +265,31 @@
 
             if (storeReport) {
                 let totalRevenue = 0;
+                let totalOrders = 0;
 
                 storeReport.forEach(row => {
+                    const [color, size] = row.variant.split(" - ");
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${row.product}</td>
-                        <td>${row.variant}</td>
+                        <td>
+                            <table>
+                                <tr>
+                                    <td>${color}</td>
+                                    <td>${size}</td>
+                                </tr>
+                            </table>
+                        </td>
                         <td>${row.quantity}</td>
                         <td>$${row.revenue}</td>
                     `;
                     reportTableBody.appendChild(tr);
                     totalRevenue += row.revenue;
+                    totalOrders += row.quantity;
                 });
 
                 totalRevenueElem.textContent = `Total Revenue: $${totalRevenue}`;
+                totalOrdersElem.textContent = `Total Orders: ${totalOrders}`;
                 reportPeriodElem.textContent = `${getMonthName(selectedMonth)} ${selectedYear}`;
             } else {
                 reportPeriodElem.textContent = `No data available for ${getMonthName(selectedMonth)} ${selectedYear}`;
@@ -325,6 +317,7 @@
         // Initialize with first store's report
         document.addEventListener("DOMContentLoaded", updateReport);
     </script>
-
 </body>
+
+
 </html>
