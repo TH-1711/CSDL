@@ -29,7 +29,7 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
+ 
         .header .logo {
             width: 100px;
             height: 50px;
@@ -40,19 +40,17 @@
             justify-content: center;
             font-weight: bold;
             color: #000103;
-            margin-right: 20px; /* Space between logo and title */
-
+            margin-right: 20px;
         }
 
         .header h1 {
-            font-size: 45px; /* Tăng kích thước font để thu hút hơn */
-            color: #000103; /* Màu chữ */
+            font-size: 45px;
+            color: #000103;
             margin: 0;
-            margin-right: 20px; /* Khoảng cách giữa logo và tiêu đề */
-            font-family: 'Dancing Script', cursive; /* Sử dụng font nghệ thuật */
-            font-weight: 700; /* Tăng độ dày của chữ */
+            margin-right: 20px;
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700;
         }
-
 
         .header .buttons {
             display: flex;
@@ -77,17 +75,37 @@
             color: white;
         }
 
+        /* Filters Section */
+        .filters {
+            background: #FFD1DC;
+            padding: 15px 30px;
+            /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+            display: flex;
+            gap: 20px;
+            justify-content: left;
+            align-items: center;
+            margin-top: 80px; /* To provide space below the header */
+        }
+
+        .filters select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
         /* Container to ensure spacing below fixed header */
         .container {
             max-width: 1200px;
-            margin: 80px auto 0; /* Added margin-top to avoid overlap with header */
+            margin: 40px auto 0; /* Adjusted margin-top for new elements */
             padding: 20px;
         }
 
         /* Grid for Product List */
         .product-list {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Two columns by default */
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
 
@@ -182,64 +200,43 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .product-list {
-                grid-template-columns: 1fr; /* One column on smaller screens */
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
+
 <body>
     <div class="header">
         <div class="logo">
-            <img src="images/hcmut.png" alt="Product Image">
-
+            <img src="images/hcmut.png" alt="Logo">
         </div>
-        <h1> HCMUT Fashion Shop</h1>
+        <h1>HCMUT Fashion Shop</h1>
         <div class="buttons">
             <button onclick="location.href='products.html'">Products</button>
             <button onclick="location.href='discount.html'">Discount</button>
             <button onclick="location.href='revenue.html'">Revenue</button>
-
         </div>
     </div>
-    <br>
+
+    <div class="filters">
+        <select id="storeSelect" onchange="filterProducts()">
+            <option value="store1">Store 1</option>
+            <option value="store2">Store 2</option>
+            <option value="store3">Store 3</option>
+        </select>
+        <select id="categorySelect" onchange="filterProducts()">
+            <option value="all">All Categories</option>
+            <option value="jeans">Jeans</option>
+            <option value="joggers">Joggers</option>
+            <option value="shirts">Shirts</option>
+        </select>
+    </div>
+
     <div class="container">
-        <div class="product-list">
-            <div class="product-item" onclick="openModal('Product 1')">
-                <img src="images/jeans1.png" alt="Product Image">
-                <h3>Product 1</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 2')">
-                <img src="images/joggers1.png" alt="Product Image">
-                <h3>Product 2</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 3')">
-                <img src="images/shirt1.png" alt="Product Image">
-                <h3>Product 3</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 4')">
-                <img src="images/jeans2.png" alt="Product Image">
-                <h3>Product 4</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 5')">
-                <img src="images/joggers2.png" alt="Product Image">
-                <h3>Product 5</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 6')">
-                <img src="images/shirt2.png" alt="Product Image">
-                <h3>Product 6</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 7')">
-                <img src="images/jeans3.png" alt="Product Image">
-                <h3>Product 7</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 8')">
-                <img src="images/joggers3.png" alt="Product Image">
-                <h3>Product 8</h3>
-            </div>
-            <div class="product-item" onclick="openModal('Product 9')">
-                <img src="images/shirt3.png" alt="Product Image">
-                <h3>Product 9</h3>
-            </div>
+        <div class="product-list" id="productList">
+            <!-- Products will be displayed here -->
         </div>
     </div>
 
@@ -257,21 +254,154 @@
                 <span>S</span>
                 <span>M</span>
                 <span>L</span>
+                <span>XL</span>
             </div>
-            <p><strong>Price:</strong> $99.99</p>
-            <button class="modal-close" onclick="closeModal()">Close</button>
+            <button onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
+        const products = {
+            store1: {
+                jeans: [
+                    { name: 'Jeans 1', image: 'images/jeans1.png' },
+                    { name: 'Jeans 2', image: 'images/jeans2.png' }
+                ],
+                joggers: [
+                    { name: 'Joggers 1', image: 'images/joggers1.png' }
+                ],
+                shirts: [
+                    { name: 'Shirt 1', image: 'images/shirt1.png' }
+                ]
+            },
+            store2: {
+                jeans: [
+                    { name: 'Jeans 3', image: 'images/jeans3.png' }
+                ],
+                joggers: [
+                    { name: 'Joggers 2', image: 'images/joggers2.png' }
+                ],
+                shirts: [
+                    { name: 'Shirt 2', image: 'images/shirt2.png' }
+                ]
+            },
+            store3: {
+                jeans: [
+                    { name: 'Jeans 4', image: 'images/jeans4.png' }
+                ],
+                joggers: [
+                    { name: 'Joggers 3', image: 'images/joggers3.png' }
+                ],
+                shirts: [
+                    { name: 'Shirt 3', image: 'images/shirt3.png' }
+                ]
+            }
+        };
+
+        function filterProducts() {
+            const store = document.getElementById('storeSelect').value;
+            const category = document.getElementById('categorySelect').value;
+            const productList = document.getElementById('productList');
+
+            // Clear the current product list
+            productList.innerHTML = '';
+
+            // Get filtered products based on selected store and category
+            let filteredProducts = [];
+            if (category === 'all') {
+                filteredProducts = [
+                    ...products[store].jeans,
+                    ...products[store].joggers,
+                    ...products[store].shirts
+                ];
+            } else {
+                filteredProducts = products[store][category] || [];
+            }
+
+            // Display filtered products
+            filteredProducts.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.onclick = () => openModal(product.name);
+
+                const productImage = document.createElement('img');
+                productImage.src = product.image;
+                productImage.alt = product.name;
+
+                const productName = document.createElement('h3');
+                productName.textContent = product.name;
+
+                productItem.appendChild(productImage);
+                productItem.appendChild(productName);
+
+                productList.appendChild(productItem);
+            });
+        }
+
         function openModal(productName) {
-            document.getElementById('modalTitle').textContent = productName;
-            document.getElementById('productModal').style.display = 'flex';
+            const modal = document.getElementById('productModal');
+            const modalTitle = document.getElementById('modalTitle');
+            modalTitle.textContent = productName;
+            modal.style.display = 'block';
         }
 
         function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'none';
         }
+
+        // Initialize the product list when the page loads
+        window.onload = filterProducts;
     </script>
+    
+    
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            margin: 10% auto;
+            width: 50%;
+            border-radius: 8px;
+        }
+
+        .variant span {
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .product-item {
+            cursor: pointer;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .product-item img {
+            width: 100px;
+            height: auto;
+        }
+    </style>
 </body>
-</html>
+

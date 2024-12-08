@@ -42,9 +42,7 @@
             font-weight: bold;
             color: #000103;
             margin-right: 20px; /* Space between logo and title */
-
         }
-
 
         .header h1 {
             font-size: 45px; /* Tăng kích thước font để thu hút hơn */
@@ -80,7 +78,7 @@
 
         .container {
             max-width: 800px;
-            margin: 50px auto;
+            margin: 70px auto;
             padding: 20px;
             background: #f3f0f0;
             border-radius: 8px;
@@ -147,80 +145,139 @@
         .promo-summary p {
             margin: 5px 0;
         }
+
+        .toggle-options {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-options button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .toggle-options button.active {
+            background: #007BFF;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">
             <img src="images/hcmut.png" alt="Product Image">
-
         </div>
-        <h1> HCMUT Fashion Shop</h1>
+        <h1>HCMUT Fashion Shop</h1>
         <div class="buttons">
             <button onclick="location.href='products.html'">Products</button>
             <button onclick="location.href='discount.html'">Discount</button>
             <button onclick="location.href='revenue.html'">Revenue</button>
-
         </div>
     </div>
-
-     <br> 
-     <br>
-     <br>
-
+    
+    <br>
+    <br>
+    <br>
     <div class="container">
-        <form id="promoForm">
-            <div class="form-group">
-                <label for="promoCode">Discount Code</label>
-                <input type="text" id="promoCode" placeholder="Enter Discount code" required>
-            </div>
-
-            <div class="form-group">
-                <label for="discount">Discount Percentage (%)</label>
-                <input type="number" id="discount" placeholder="Enter discount percentage" min="1" max="100" required>
-            </div>
-
-            <div class="form-group">
-                <label for="productCodes">Applicable Product Codes</label>
-                <textarea id="productCodes" placeholder="Enter product codes separated by commas" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" placeholder="Enter Discount description"></textarea>
-            </div>
-
-            <button type="button" class="button" onclick="createDiscount()">Create Discount</button>
-        </form>
-
-        <div class="promo-summary" id="promoSummary" style="display: none;">
-            <h3>Discount Details</h3>
-            <p><strong>Code:</strong> <span id="summaryCode"></span></p>
-            <p><strong>Discount:</strong> <span id="summaryDiscount"></span>%</p>
-            <p><strong>Applicable Products:</strong> <span id="summaryProducts"></span></p>
-            <p><strong>Description:</strong> <span id="summaryDescription"></span></p>
+        <div class="toggle-options">
+            <button id="createDiscountBtn" class="active" onclick="showCreateDiscount()">Create Discount</button>
+            <button id="applyDiscountBtn" onclick="showApplyDiscount()">Apply Discount</button>
         </div>
+
+     
+
+        <div id="createDiscountForm">
+            <form id="promoForm">
+                <div class="form-group">
+                    <label for="promoCode">Discount Code</label>
+                    <input type="text" id="promoCode" placeholder="Enter Discount code" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="discount">Discount Percentage (%)</label>
+                    <input type="number" id="discount" placeholder="Enter discount percentage" min="1" max="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productCodes">Applicable Product Codes</label>
+                    <textarea id="productCodes" placeholder="Enter product codes separated by commas" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Enter Discount description"></textarea>
+                </div>
+
+                <button type="button" class="button" onclick="createDiscount()">Create Discount</button>
+            </form>
+
+            <div class="promo-summary" id="promoSummary" style="display: none;">
+                <h3>Discount Details</h3>
+                <p><strong>Code:</strong> <span id="summaryCode"></span></p>
+                <p><strong>Discount:</strong> <span id="summaryDiscount"></span>%</p>
+                <p><strong>Applicable Products:</strong> <span id="summaryProducts"></span></p>
+                <p><strong>Description:</strong> <span id="summaryDescription"></span></p>
+            </div>
+        </div>
+
+        <div id="applyDiscountForm" style="display: none;">
+            <form id="applyForm">
+                <div class="form-group">
+                    <label for="applyCode">Enter Discount Code</label>
+                    <input type="text" id="applyCode" placeholder="Enter your discount code" required>
+                </div>
+                <div class="form-group">
+                    <label for="productId">Enter Product ID</label>
+                    <input type="text" id="productId" placeholder="Enter the product ID" required>
+                </div>
+                <button type="button" class="button" onclick="applyDiscount()">Apply Discount</button>
+            </form>
+        
+            <div class="promo-summary" id="applySummary" style="display: none;">
+                <h3>Applied Discount Details</h3>
+                <p><strong>Code:</strong> <span id="applySummaryCode"></span></p>
+                <p><strong>Product ID:</strong> <span id="applySummaryProduct"></span></p>
+                <p><strong>Status:</strong> Valid!</p>
+            </div>
+        </div>
+        
     </div>
 
     <script>
-        function createDiscount() {
-            const promoCode = document.getElementById('promoCode').value;
-            const discount = document.getElementById('discount').value;
-            const productCodes = document.getElementById('productCodes').value;
-            const description = document.getElementById('description').value;
+        function showCreateDiscount() {
+            document.getElementById("createDiscountForm").style.display = "block";
+            document.getElementById("applyDiscountForm").style.display = "none";
 
-            if (!promoCode || !discount || !productCodes) {
-                alert('Please fill out all required fields.');
-                return;
-            }
-
-            document.getElementById('summaryCode').textContent = promoCode;
-            document.getElementById('summaryDiscount').textContent = discount;
-            document.getElementById('summaryProducts').textContent = productCodes;
-            document.getElementById('summaryDescription').textContent = description || 'N/A';
-
-            document.getElementById('promoSummary').style.display = 'block';
+            document.getElementById("createDiscountBtn").classList.add("active");
+            document.getElementById("applyDiscountBtn").classList.remove("active");
         }
+
+        function showApplyDiscount() {
+            document.getElementById("applyDiscountForm").style.display = "block";
+            document.getElementById("createDiscountForm").style.display = "none";
+
+            document.getElementById("applyDiscountBtn").classList.add("active");
+            document.getElementById("createDiscountBtn").classList.remove("active");
+        }
+        
+        function applyDiscount() {
+            const applyCode = document.getElementById("applyCode").value;
+            const productId = document.getElementById("productId").value;
+
+            // Thực hiện kiểm tra hợp lệ hoặc các logic khác tại đây
+            if (applyCode && productId) {
+                document.getElementById("applySummary").style.display = "block";
+                document.getElementById("applySummaryCode").textContent = applyCode;
+                document.getElementById("applySummaryProduct").textContent = productId;
+            } else {
+                alert("Please enter both Discount Code and Product ID.");
+            }
+        }
+
     </script>
 </body>
-</html>
