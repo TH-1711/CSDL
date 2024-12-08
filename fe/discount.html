@@ -194,7 +194,6 @@
             <img src="images/hcmut.png" alt="Product Image">
         </div>
         <h1>HCMUT Fashion Shop</h1>
-        <h1>HCMUT Fashion Shop</h1>
         <div class="buttons">
             <button onclick="location.href='products.html'">Products</button>
             <button onclick="location.href='discount.html'">Discount</button>
@@ -205,10 +204,7 @@
     <br>
     <br>
     <br>
-    
-    <br>
-    <br>
-    <br>
+
     <div class="container">
         <div class="toggle-options">
             <button id="createDiscountBtn" class="active" onclick="showCreateDiscount()">Create Discount</button>
@@ -218,32 +214,23 @@
         <div id="createDiscountForm">
             <form id="promoForm">
                 <div class="form-group">
-                    <label for="promoCode">Discount Code</label>
-                    <input type="text" id="promoCode" placeholder="Enter Discount code" required>
+                    <label for="contentPromo">Nội dung mã giảm giá</label>
+                    <input type="text" id="contentPromo" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="productCodes">Applicable Product Codes</label>
-                    <textarea id="productCodes" placeholder="Enter product codes separated by commas" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="productCodes">Applicable Product Codes</label>
-                    <textarea id="productCodes" placeholder="Enter product codes separated by commas" required></textarea>
+                    <label for="startDate">Ngày bắt đầu</label>
+                    <!-- <textarea id="productCodes" placeholder="Enter product codes separated by commas" required></textarea> -->
+                    <input type="date" id="startDate" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" placeholder="Enter Discount description"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" placeholder="Enter Discount description"></textarea>
+                    <label for="endDate">Ngày hết hạn</label>
+                    <!-- <textarea id="description" placeholder="Enter Discount description"></textarea> -->
+                    <input type="date" id="endDate" required>
                 </div>
 
                 <button type="button" class="button" onclick="createDiscount()">Create Discount</button>
-            </form>
-                <button type="button" class="button" onclick="createDiscount()">Create Discount</button>
-            </form>
 
             <div class="promo-summary" id="promoSummary" style="display: none;">
                 <h3>Discount Details</h3>
@@ -257,16 +244,16 @@
         <div id="applyDiscountForm" style="display: none;">
             <form id="applyForm">
                 <div class="form-group">
-                    <label for="applyCode">Enter Discount Code</label>
-                    <input type="text" id="applyCode" placeholder="Enter your discount code" required>
+                    <label for="applyCode">Nhập mã khuyến mãi</label>
+                    <input type="text" id="applyCode" required>
                 </div>
                 <div class="form-group">
-                    <label for="productId">Enter Product ID</label>
-                    <input type="text" id="productId" placeholder="Enter the product ID" required>
+                    <label for="productId">Nhập mã sản phẩm</label>
+                    <input type="text" id="productId" required>
                 </div>
                 <div class="form-group">
-                    <label for="discount">Discount Percentage (%)</label>
-                    <input type="number" id="discount" placeholder="Enter discount percentage" min="1" max="100" required>
+                    <label for="discount">Mức giảm giá (%)</label>
+                    <input type="number" id="discount" min="1" max="100" required>
                 </div>
                 <button type="button" class="button" onclick="applyDiscount()">Apply Discount</button>
             </form>
@@ -288,19 +275,7 @@
 
             document.getElementById("createDiscountBtn").classList.add("active");
             document.getElementById("applyDiscountBtn").classList.remove("active");
-        }
-
-        function showApplyDiscount() {
-            document.getElementById("applyDiscountForm").style.display = "block";
-            document.getElementById("createDiscountForm").style.display = "none";
-        }
-        function showCreateDiscount() {
-            document.getElementById("createDiscountForm").style.display = "block";
-            document.getElementById("applyDiscountForm").style.display = "none";
-
-            document.getElementById("createDiscountBtn").classList.add("active");
-            document.getElementById("applyDiscountBtn").classList.remove("active");
-        }
+        }        
 
         function showApplyDiscount() {
             document.getElementById("applyDiscountForm").style.display = "block";

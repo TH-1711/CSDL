@@ -1,14 +1,55 @@
-const apiUrl = 'http://localhost:3000/api/product';
+const baseUrl = 'http://localhost:3000/api/product';
+// const apiFilterUrl = `${baseUrl}/getProductByStoreAndCategory`;
 
 async function fetchProducts() {
     try {
-        const response = await fetch(apiUrl);
+        const response = await fetch(baseUrl);
         const products = await response.json();
         // console.log(products);
         displayProducts(products);
     }
     catch (error) {
         console.error("Error fetching product data:", error);
+    }
+}
+
+async function filterProducts() {
+    // Get the selected store ID and category ID
+    const storeSelect = document.getElementById("storeSelect");
+    const categorySelect = document.getElementById("categorySelect");
+    const storeID = storeSelect.value;
+    const categoryID = categorySelect.value;
+
+    try {
+        let apiUrl;
+        if (categoryID === "all" && storeID !== "all") {
+            apiUrl = `${baseUrl}/getProductByStore?storeID=${storeID}`;
+        } else if (categoryID !== "all" && storeID === "all"){
+            apiUrl = `${baseUrl}/getProductByCategory?categoryID=${categoryID}`;
+        } else if (categoryID !== "all" && storeID !== "all") {
+            apiUrl = `${baseUrl}/getProductByStoreAndCategory?storeID=${storeID}&categoryID=${categoryID}`;
+        } else {
+            apiUrl = `${baseUrl}`
+        }
+
+        // Fetch data from the API
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`Error fetching data: ${response.status}`);
+        }
+        const products = await response.json();
+
+        if (products.length === 0) {
+            alert('Không tìm thấy sản phẩm thuộc danh mục này.');
+        }
+        
+        //console.log(products);
+        displayProducts(products);
+
+    } catch (error) {
+        console.error("Error fetching filtered product data:", error);
+        // alert("Failed to fetch product data. Please try again.");
+        alert('Không tìm thấy sản phẩm thuộc danh mục này.');
     }
 }
 
@@ -35,6 +76,7 @@ function openModal(productId, name, description, discount) {
     // Update modal content
     document.getElementById('modalTitle').textContent = name;
     document.getElementById('modalPrice').innerHTML = `
+        <p><strong>Mã sản phẩm:</strong> ${productId}</p>
         <p><strong>Mô tả:</strong> ${description}</p>
         <p><strong>Chiết khấu cho nhân viên:</strong> ${discount}%</p>
     `;
@@ -42,35 +84,6 @@ function openModal(productId, name, description, discount) {
     // Show the modal
     document.getElementById('productModal').style.display = 'flex';
 }
-
-// function openModal(productId) {
-//     const product = products.find(p => p.id === productId);
-
-//     // Update the modal title and price
-//     document.getElementById('modalTitle').textContent = product.name;
-//     document.getElementById('modalPrice').innerHTML = `<strong>Price:</strong> ${product.price}`;
-    
-//     // Display product colors
-//     const colorList = document.querySelector('#productModal .variant.colors');
-//     colorList.innerHTML = '<strong>Colors:</strong>';
-//     product.colors.forEach(color => {
-//         const colorSpan = document.createElement('span');
-//         colorSpan.textContent = color;
-//         colorList.appendChild(colorSpan);
-//     });
-
-//     // Display product sizes
-//     const sizeList = document.querySelector('#productModal .variant.sizes');
-//     sizeList.innerHTML = '<strong>Sizes:</strong>';
-//     product.sizes.forEach(size => {
-//         const sizeSpan = document.createElement('span');
-//         sizeSpan.textContent = size;
-//         sizeList.appendChild(sizeSpan);
-//     });
-
-//     // Show the modal
-//     document.getElementById('productModal').style.display = 'flex';
-// }
 
 function closeModal() {
     document.getElementById('productModal').style.display = 'none';
@@ -82,3 +95,5 @@ function closeModal() {
 // });
 
 document.addEventListener("DOMContentLoaded", fetchProducts);
+
+

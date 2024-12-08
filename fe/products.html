@@ -208,6 +208,7 @@
 
 
 <body>
+
     <div class="header">
         <div class="logo">
             <img src="images/hcmut.png" alt="Logo">
@@ -219,17 +220,23 @@
             <button onclick="location.href='revenue.html'">Revenue</button>
         </div>
     </div>
+
     <div class="filters">
         <select id="storeSelect" onchange="filterProducts()">
-            <option value="store1">Store 1</option>
-            <option value="store2">Store 2</option>
-            <option value="store3">Store 3</option>
+            <option value="all">Tất cả cửa hàng</option>
+            <option value="10001">Cửa hàng 1</option>
+            <option value="10002">Cửa hàng 2</option>
+            <option value="10003">Cửa hàng 3</option>
         </select>
         <select id="categorySelect" onchange="filterProducts()">
-            <option value="all">All Categories</option>
-            <option value="jeans">Jeans</option>
-            <option value="joggers">Joggers</option>
-            <option value="shirts">Shirts</option>
+            <option value="all">Tất cả</option>
+            <option value="1">Thời trang nam</option>
+            <option value="2">Thời trang nữ</option>
+            <option value="3">Thời trang thể thao</option>
+            <option value="4">Phụ kiện</option>
+            <option value="5">Giày dép</option>
+            <option value="6">Túi và ví</option>
+            <option value="7">Trang sức</option>
         </select>
     </div>
 
@@ -254,7 +261,10 @@
         </div>  
     </div>
 
+
+
     <script src="./script/api.js">
+        
     </script>
     
     
