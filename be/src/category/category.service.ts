@@ -10,7 +10,7 @@ interface Category {
 export class CategoryService {
   constructor(private readonly categoryService: PrismaService) {}
 
-  async fetchAllCategory() {
+  async getAllCategory() {
     try {
       const categories = await this.categoryService.$queryRaw<
         Category[]
@@ -26,13 +26,13 @@ export class CategoryService {
     }
   }
 
-  async productCountByCategory(id: number) {
+  async productCountByCategory(categoryID: number) {
     try {
-      console.log("Input ID:", id); // Log the input to verify it's passed correctly
+      console.log("Input ID:", categoryID); // Log the input to verify it's passed correctly
 
       const result = await this.categoryService.$queryRaw<
         [{ count: number }]
-      >`SELECT CountProductsInCatalog(${id}) AS count`;
+      >`SELECT CountProductsInCatalog(${categoryID}) AS count`;
 
       if (result.length > 0) {
         return { count: result[0].count.toString() }; // Convert to string for response

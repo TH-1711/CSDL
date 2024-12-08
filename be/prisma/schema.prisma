@@ -271,8 +271,8 @@ model store {
 }
 
 model variation_color {
-  color                                                           String    @unique    @db.VarChar(255)
-  variation_id                                                    String    @unique    @db.VarChar(255)
+  color                                                           String               @db.VarChar(255)
+  variation_id                                                    String               @db.VarChar(255)
   detail_report_detail_report_colorTovariation_color              detail_report[]      @relation("detail_report_colorTovariation_color")
   detail_report_detail_report_variation_idTovariation_color       detail_report[]      @relation("detail_report_variation_idTovariation_color")
   order_detail_order_detail_colorTovariation_color                order_detail[]       @relation("order_detail_colorTovariation_color")
