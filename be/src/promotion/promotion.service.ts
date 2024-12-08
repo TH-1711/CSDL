@@ -59,25 +59,55 @@ export class PromotionService {
   async createPromotion(content: string, start_date: string, end_date: string) {
     try {
       // First, call the stored procedure
-      await this.prisma.$executeRaw`
+      await this.prisma.$executeRawUnsafe(`
         CALL AddNewPromotion('${content}', '${start_date}', '${end_date}',@new_id);
-      `;
+      `);
 
-      // Then, fetch the result from the session variable
-      const result = await this.prisma.$queryRaw<[{ newPromoID: number }]>`
-        SELECT @new_id AS newPromoID;
+      // Then, fetch the result from the session variable ---> This can be improved by returning only the newID
+      const result = await this.prisma.$queryRaw<Promotion[]>`
+        SELECT * from promotion WHERE id = @new_id;
       `;
 
       // Return the promotion details including the new ID
-      return {
-        promotionID: result[0].newPromoID.toString(),
-        content: content,
-        start_date: start_date,
-        end_date: end_date,
-      };
+      return result.map((promotion) => ({
+        ...promotion,
+        id: promotion.id.toString(),
+      }));
     } catch (error) {
       console.error("Error creating promotion:", error);
       throw new Error("Failed to create promotion.");
     }
+  }
+
+  async applyPromotion(
+    promotionID: number,
+    productIDs: number[],
+    discountRate: number,
+    useCondition: string,
+  ) {
+    console.log("Promotion ID:", promotionID);
+    console.log("Applying promotion to products:", productIDs);
+    if (!promotionID || isNaN(promotionID) || productIDs.length === 0) {
+      throw new Error("Promotion: Invalid input parameters.");
+    }
+
+    const results = await Promise.all(
+      productIDs.map(async (productID) => {
+        try {
+          await this.prisma.$executeRawUnsafe(`
+            CALL ApplyPromotion(${productID}, ${promotionID}, ${discountRate}, '${useCondition}');
+          `);
+          return { productID, status: "success" };
+        } catch (error) {
+          console.error(
+            `Error applying promotion to product ${productID}:`,
+            error,
+          );
+          return { productID, status: "fail", error: error.message };
+        }
+      }),
+    );
+
+    return results;
   }
 }

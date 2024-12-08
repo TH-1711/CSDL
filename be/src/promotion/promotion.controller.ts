@@ -46,15 +46,27 @@ export class PromotionController {
     );
   }
 
-  //   @Post("apply")
-  //   async applyPromotion(
-  //     @Body()
-  //     promotion: {
-  //       promotionID: number;
-  //       productID: number;
-  //     },
-  //   ) {
-  //     const { promotionID, productID } = promotion;
-  //     return await this.promotionService.applyPromotion(promotionID, productID);
-  //   }
+  @Post("apply")
+  async applyPromotion(
+    @Body()
+    body: {
+      promotionID: number;
+      productIDs: number[];
+      discountRate: number;
+      useCondition: string;
+    },
+  ) {
+    const { promotionID, productIDs, discountRate, useCondition } = body;
+    console.log("input:Promotion ID:", promotionID);
+    console.log("input:Applying promotion to products:", productIDs);
+    if (!promotionID || !productIDs) {
+      return { error: "Invalid input parameters." };
+    }
+    return await this.promotionService.applyPromotion(
+      promotionID,
+      productIDs,
+      discountRate,
+      useCondition,
+    );
+  }
 }
