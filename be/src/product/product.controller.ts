@@ -32,4 +32,11 @@ export class ProductController {
       categoryID,
     );
   }
+
+  @Get("getVariationByProduct")
+  async getVariationByProduct(
+    @Query("productID", ParseIntPipe) productID: number,
+  ) {
+    return await this.productService.getVariationByProduct(productID);
+  }
 }

@@ -10,6 +10,15 @@ interface Product {
   store_name: string;
 }
 
+interface ProductVariation {
+  id: number;
+  origin_price: string;
+  sell_price: string;
+  size: string;
+  product_id: number;
+  colors: string | string[] | null;
+}
+
 @Injectable()
 export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
@@ -27,7 +36,11 @@ export class ProductService {
       }));
     } catch (error) {
       console.error("Error in getAllProducts:", error);
-      throw new Error("Failed to fetch products.");
+      return {
+        status: "Failed",
+        error: "Failed to fetch products.",
+        message: error.message,
+      };
     }
   }
 
@@ -35,7 +48,10 @@ export class ProductService {
     try {
       // Validate categoryID
       if (!categoryID || isNaN(categoryID)) {
-        throw new Error("Invalid category ID");
+        return {
+          status: "Failed",
+          message: "Error in getProductByCategory: Invalid category ID.",
+        };
       }
 
       // Raw SQL query to fetch products by category
@@ -62,7 +78,11 @@ export class ProductService {
       }));
     } catch (error) {
       console.error("Error in productByCategory:", error.message);
-      throw new Error(error.message || "Failed to fetch products by category.");
+      return {
+        status: "Failed",
+        error: "Failed to fetch products by category.",
+        message: error.message,
+      };
     }
   }
 
@@ -97,7 +117,11 @@ export class ProductService {
       }));
     } catch (error) {
       console.error("Error in getProductsByStore:", error);
-      throw new Error("Failed to fetch products for the store.");
+      return {
+        status: "Failed",
+        error: "Failed to fetch products for the store.",
+        message: error.message,
+      };
     }
   }
 
@@ -132,7 +156,55 @@ export class ProductService {
       }));
     } catch (error) {
       console.error("Error in getProductsByStoreAndCategory:", error);
-      throw new Error("Failed to fetch products for the store and category.");
+      return {
+        status: "Failed",
+        error: "Failed to fetch products for the store and category.",
+        message: error.message,
+      };
+    }
+  }
+
+  async getVariationByProduct(productID: number) {
+    try {
+      // Fetch product variations along with their associated colors
+      const variations = await this.prisma.$queryRaw<ProductVariation[]>`
+        SELECT 
+          pv.id, 
+          pv.origin_price, 
+          pv.sell_price, 
+          pv.size, 
+          pv.product_id, 
+          GROUP_CONCAT(vc.color) AS colors
+        FROM 
+          product_variation pv
+        LEFT JOIN 
+          variation_color vc ON pv.id = vc.variation_id
+        WHERE 
+          pv.product_id = ${productID}
+        GROUP BY 
+          pv.id, pv.origin_price, pv.sell_price, pv.size, pv.product_id`;
+
+      // Transform data
+      return variations.map((variation) => ({
+        ...variation,
+        id: variation.id.toString(),
+        origin_price: variation.origin_price,
+        sell_price: variation.sell_price,
+        size: variation.size,
+        product_id: variation.product_id.toString(),
+        colors: Array.isArray(variation.colors)
+          ? variation.colors
+          : variation.colors
+            ? variation.colors.split(",")
+            : [],
+      }));
+    } catch (error) {
+      console.error("Error in getVariationByProductID:", error.message);
+      return {
+        status: "Failed",
+        error: "Failed to fetch product variations.",
+        message: error.message,
+      };
     }
   }
 }

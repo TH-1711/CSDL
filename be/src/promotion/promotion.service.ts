@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import e from "express";
 
 interface Promotion {
   id: number;
@@ -24,7 +25,10 @@ export class PromotionService {
       }));
     } catch (error) {
       console.error("Error in getAllPromotions:", error);
-      throw new Error("Failed to fetch promotions.");
+      return {
+        status: "Failed",
+        message: `Error in getALLPromotions: ${error.message}`,
+      };
     }
   }
 
@@ -43,7 +47,10 @@ export class PromotionService {
           id = ${promotionID}`;
 
       if (!promotion || promotion.length === 0) {
-        throw new Error("No promotion found for this ID.");
+        return {
+          status: "Failed",
+          message: "Error:Promotion not found.",
+        };
       }
 
       return promotion.map((promotion) => ({
@@ -52,7 +59,10 @@ export class PromotionService {
       }))[0];
     } catch (error) {
       console.error("Error in getPromotionById:", error);
-      throw new Error("Failed to fetch promotion.");
+      return {
+        status: "Failed",
+        message: `Error in getPromotionById: ${error.message}`,
+      };
     }
   }
 
@@ -75,7 +85,10 @@ export class PromotionService {
       }));
     } catch (error) {
       console.error("Error creating promotion:", error);
-      throw new Error("Failed to create promotion.");
+      return {
+        status: "Failed",
+        message: `Error creating promotion: ${error.message}`,
+      };
     }
   }
 
@@ -88,7 +101,10 @@ export class PromotionService {
     console.log("Promotion ID:", promotionID);
     console.log("Applying promotion to products:", productIDs);
     if (!promotionID || isNaN(promotionID) || productIDs.length === 0) {
-      throw new Error("Promotion: Invalid input parameters.");
+      return {
+        status: "Failed",
+        message: "Error applying promotion: Invalid input parameters.",
+      };
     }
 
     const results = await Promise.all(
@@ -103,7 +119,12 @@ export class PromotionService {
             `Error applying promotion to product ${productID}:`,
             error,
           );
-          return { productID, status: "fail", error: error.message };
+          return {
+            productID,
+            status: "fail",
+            error: `Error applying promotion to product ${productID}:`,
+            message: error.message,
+          };
         }
       }),
     );
@@ -129,6 +150,61 @@ export class PromotionService {
     } catch (error) {
       console.error("Error deleting promotion:", error);
       return { success: false, message: "Failed to delete promotion." };
+    }
+  }
+
+  async updatePromotion(
+    promotionID: number,
+    updates: {
+      content?: string;
+      start_date?: string;
+      end_date?: string;
+      discountRate?: number;
+      useCondition?: string;
+    },
+  ) {
+    try {
+      // Begin the dynamic SQL update construction
+      const updateFields: string[] = [];
+      if (updates.content) {
+        updateFields.push(`content = '${updates.content}'`);
+      }
+      if (updates.start_date) {
+        updateFields.push(`start_date = '${updates.start_date}'`);
+      }
+      if (updates.end_date) {
+        updateFields.push(`end_date = '${updates.end_date}'`);
+      }
+      if (updates.useCondition) {
+        updateFields.push(`use_condition = '${updates.useCondition}'`);
+      }
+
+      if (updateFields.length > 0) {
+        const updateQuery = `
+          UPDATE promotion
+          SET ${updateFields.join(", ")}
+          WHERE id = ${promotionID};
+        `;
+        await this.prisma.$executeRawUnsafe(updateQuery);
+      }
+
+      // Call the AdjustDiscountRateForPromotion stored procedure if discountRate is provided
+      if (updates.discountRate !== undefined && updates.discountRate !== null) {
+        await this.prisma.$executeRawUnsafe(`
+          CALL AdjustDiscountRateForPromotion(${promotionID}, ${updates.discountRate});
+        `);
+      }
+
+      return {
+        status: "Success",
+        message: `Promotion ${promotionID} updated successfully.`,
+      };
+    } catch (error) {
+      console.error("Error updating promotion:", error);
+      return {
+        status: "Failed",
+        message: `Error updating promotion: ${error.message}`,
+      };
     }
   }
 }

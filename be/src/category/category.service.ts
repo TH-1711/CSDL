@@ -22,7 +22,11 @@ export class CategoryService {
       }));
     } catch (error) {
       console.error("Error fetching categories:", error);
-      throw new Error("Failed to fetch categories.");
+      return {
+        status: "Failed",
+        error: "Failed to fetch categories.",
+        message: error.message,
+      };
     }
   }
 
@@ -37,11 +41,19 @@ export class CategoryService {
       if (result.length > 0) {
         return { count: result[0].count.toString() }; // Convert to string for response
       } else {
-        throw new Error("No result found for the given ID.");
+        return {
+          status: "Failed",
+          error: "Category not found.",
+          message: "Error in productCountByCategory: Category not found.",
+        };
       }
     } catch (error) {
       console.error("Error in productCountByCategory:", error);
-      throw new Error("Failed to fetch product count.");
+      return {
+        status: "Failed",
+        error: "Failed to fetch product count by category.",
+        message: "Error in productCountByCategory.",
+      };
     }
   }
 }
