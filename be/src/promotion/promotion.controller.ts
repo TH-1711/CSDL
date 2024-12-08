@@ -5,6 +5,8 @@ import {
   ParseIntPipe,
   Post,
   Body,
+  Delete,
+  Put,
 } from "@nestjs/common";
 import { PromotionService } from "./promotion.service";
 
@@ -13,8 +15,8 @@ export class PromotionController {
   constructor(private readonly promotionService: PromotionService) {}
 
   //   @Get()
-  //   async getAllPromotion() {
-  //     return await this.promotionService.getAllPromotion();
+  //   async getAllPromotions() {
+  //     return await this.promotionService.getAllPromotions();
   //   }
 
   //   @Get("getPromotionByStore")
@@ -68,5 +70,18 @@ export class PromotionController {
       discountRate,
       useCondition,
     );
+  }
+
+  @Delete("delete")
+  async deletePromotion(
+    @Query("promotionID", ParseIntPipe) promotionID: number,
+  ) {
+    console.log("Input: Promotion ID:", promotionID);
+
+    if (!promotionID || isNaN(promotionID)) {
+      return { error: "Invalid promotion ID." };
+    }
+
+    return await this.promotionService.deletePromotion(promotionID);
   }
 }

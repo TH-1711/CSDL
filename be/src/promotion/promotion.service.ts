@@ -110,4 +110,25 @@ export class PromotionService {
 
     return results;
   }
+
+  async deletePromotion(promotionID: number) {
+    try {
+      // Call the stored procedure
+      await this.prisma.$executeRawUnsafe(`
+        CALL RemovePromotion(${promotionID});
+      `);
+
+      console.log(
+        `Promotion with ID ${promotionID} has been deleted successfully.`,
+      );
+
+      return {
+        success: true,
+        message: `Promotion with ID ${promotionID} deleted successfully.`,
+      };
+    } catch (error) {
+      console.error("Error deleting promotion:", error);
+      return { success: false, message: "Failed to delete promotion." };
+    }
+  }
 }
