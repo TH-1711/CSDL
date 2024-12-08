@@ -100,4 +100,39 @@ export class ProductService {
       throw new Error("Failed to fetch products for the store.");
     }
   }
+
+  async getProductByStoreAndCategory(storeID: number, categoryID: number) {
+    try {
+      const products = await this.prisma.$queryRaw<Product[]>`SELECT 
+          p.id, 
+          p.name, 
+          p.description, 
+          p.discount_for_employee,
+          s.id AS store_id, 
+          s.name AS store_name
+        FROM 
+          product p
+        INNER JOIN 
+          product_in_catalog pic ON pic.product_id = p.id
+        INNER JOIN 
+          catalog c ON c.id = pic.catalog_id
+        INNER JOIN
+          catalog_in_store cis ON cis.catalog_id = c.id
+        INNER JOIN 
+          store s ON s.id = cis.store_id
+        WHERE 
+          s.id = ${storeID} AND c.id = ${categoryID}`;
+
+      // Map products to transform data if necessary
+      return products.map((product) => ({
+        ...product,
+        id: product.id.toString(),
+        store_id: product.store_id.toString(),
+        store_name: product.store_name,
+      }));
+    } catch (error) {
+      console.error("Error in getProductsByStoreAndCategory:", error);
+      throw new Error("Failed to fetch products for the store and category.");
+    }
+  }
 }

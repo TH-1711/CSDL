@@ -29,7 +29,7 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
+ 
         .header .logo {
             width: 100px;
             height: 50px;
@@ -40,19 +40,17 @@
             justify-content: center;
             font-weight: bold;
             color: #000103;
-            margin-right: 20px; /* Space between logo and title */
-
+            margin-right: 20px;
         }
 
         .header h1 {
-            font-size: 45px; /* Tăng kích thước font để thu hút hơn */
-            color: #000103; /* Màu chữ */
+            font-size: 45px;
+            color: #000103;
             margin: 0;
-            margin-right: 20px; /* Khoảng cách giữa logo và tiêu đề */
-            font-family: 'Dancing Script', cursive; /* Sử dụng font nghệ thuật */
-            font-weight: 700; /* Tăng độ dày của chữ */
+            margin-right: 20px;
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700;
         }
-
 
         .header .buttons {
             display: flex;
@@ -77,17 +75,37 @@
             color: white;
         }
 
+        /* Filters Section */
+        .filters {
+            background: #FFD1DC;
+            padding: 15px 30px;
+            /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+            display: flex;
+            gap: 20px;
+            justify-content: left;
+            align-items: center;
+            margin-top: 80px; /* To provide space below the header */
+        }
+
+        .filters select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
         /* Container to ensure spacing below fixed header */
         .container {
             max-width: 1200px;
-            margin: 80px auto 0; /* Added margin-top to avoid overlap with header */
+            margin: 40px auto 0; /* Adjusted margin-top for new elements */
             padding: 20px;
         }
 
         /* Grid for Product List */
         .product-list {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Two columns by default */
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
 
@@ -182,24 +200,37 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .product-list {
-                grid-template-columns: 1fr; /* One column on smaller screens */
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
+
 <body>
     <div class="header">
         <div class="logo">
-            <img src="images/hcmut.png" alt="Product Image">
+            <img src="images/hcmut.png" alt="Logo">
         </div>
-
-        <h1> HCMUT Fashion Shop</h1>
+        <h1>HCMUT Fashion Shop</h1>
         <div class="buttons">
             <button onclick="location.href='products.html'">Products</button>
             <button onclick="location.href='discount.html'">Discount</button>
             <button onclick="location.href='revenue.html'">Revenue</button>
-
         </div>
+    </div>
+    <div class="filters">
+        <select id="storeSelect" onchange="filterProducts()">
+            <option value="store1">Store 1</option>
+            <option value="store2">Store 2</option>
+            <option value="store3">Store 3</option>
+        </select>
+        <select id="categorySelect" onchange="filterProducts()">
+            <option value="all">All Categories</option>
+            <option value="jeans">Jeans</option>
+            <option value="joggers">Joggers</option>
+            <option value="shirts">Shirts</option>
+        </select>
     </div>
 
     <br>
@@ -225,5 +256,55 @@
 
     <script src="./script/api.js">
     </script>
+    
+    
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            margin: 10% auto;
+            width: 50%;
+            border-radius: 8px;
+        }
+
+        .variant span {
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .product-item {
+            cursor: pointer;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .product-item img {
+            width: 100px;
+            height: auto;
+        }
+    </style>
 </body>
-</html>
+
