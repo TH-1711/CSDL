@@ -83,10 +83,76 @@ function openModal(productId, name, description, discount) {
 
     // Show the modal
     document.getElementById('productModal').style.display = 'flex';
+
+    // Fetch variations for the product
+    fetch(`http://localhost:3000/api/product/getVariationByProduct?productID=${productId}`)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch product variations: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((variations) => {
+            // Populate the modal with sizes and prices
+            const sizesContainer = document.querySelector('.variant.sizes');
+            const colorsContainer = document.querySelector('.variant.colors');
+
+            // Clear any existing content
+            sizesContainer.innerHTML = '';
+            colorsContainer.innerHTML = '';
+
+            // Populate sizes with clickable functionality
+            variations.forEach((variation) => {
+                const sizeElement = document.createElement('span');
+                sizeElement.className = 'size';
+                sizeElement.textContent = variation.size;
+
+                // Add click event to show colors and prices for the selected size
+                sizeElement.addEventListener('click', () => {
+                    // Highlight the selected size
+                    document.querySelectorAll('.size').forEach(el => el.classList.remove('selected'));
+                    sizeElement.classList.add('selected');
+
+                    // Display colors for the selected size
+                    colorsContainer.innerHTML = `
+                        <strong>Màu hiện có:</strong> 
+                        ${variation.colors.map(color => `<span class="color">${color}</span>`).join('')}
+                    `;
+
+                    // Display prices for the selected size
+                    document.getElementById('modalPrice').innerHTML = `
+                        <p><strong>Mã sản phẩm:</strong> ${productId}</p>
+                        <p><strong>Mô tả:</strong> ${description}</p>
+                        <p><strong>Chiết khấu cho nhân viên:</strong> ${discount}%</p>
+                        <p><strong>Giá gốc:</strong> ${variation.origin_price} VND</p>
+                        <p><strong>Giá bán:</strong> ${variation.sell_price} VND</p>
+                    `;
+                });
+
+                sizesContainer.appendChild(sizeElement);
+            });
+
+            // Initial state: Display no colors or prices
+            colorsContainer.innerHTML = '<strong>Click a size to view available colors</strong>';
+        })
+        .catch((error) => {
+            console.error("Error fetching product variations:", error);
+            alert("Failed to load product variations. Please try again.");
+        });
+
+    // Show the modal
+    document.getElementById('productModal').style.display = 'flex';
 }
 
 function closeModal() {
     document.getElementById('productModal').style.display = 'none';
+}
+
+function openAddProductModal() {
+    document.getElementById('addProductModal').style.display = 'block';
+}
+function closeAddProductModal() {
+    document.getElementById('addProductModal').style.display = 'none';
 }
 
 // Call the displayProducts function when the page loads

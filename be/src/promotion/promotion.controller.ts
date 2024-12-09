@@ -5,6 +5,8 @@ import {
   ParseIntPipe,
   Post,
   Body,
+  Delete,
+  Put,
 } from "@nestjs/common";
 import { PromotionService } from "./promotion.service";
 
@@ -12,10 +14,10 @@ import { PromotionService } from "./promotion.service";
 export class PromotionController {
   constructor(private readonly promotionService: PromotionService) {}
 
-  //   @Get()
-  //   async getAllPromotion() {
-  //     return await this.promotionService.getAllPromotion();
-  //   }
+  @Get()
+  async getAllPromotions() {
+    return await this.promotionService.getAllPromotions();
+  }
 
   //   @Get("getPromotionByStore")
   //   async getPromotionByStore(@Query("storeID", ParseIntPipe) storeID: number) {
@@ -26,6 +28,12 @@ export class PromotionController {
   async getPromotionByID(
     @Query("promotionID", ParseIntPipe) promotionID: number,
   ) {
+    if (!promotionID || isNaN(promotionID)) {
+      return {
+        status: "Failed",
+        message: "Invalid promotion ID.",
+      };
+    }
     return await this.promotionService.getPromotionByID(promotionID);
   }
 
@@ -68,5 +76,40 @@ export class PromotionController {
       discountRate,
       useCondition,
     );
+  }
+
+  @Delete("delete")
+  async deletePromotion(
+    @Query("promotionID", ParseIntPipe) promotionID: number,
+  ) {
+    console.log("Input: Promotion ID:", promotionID);
+
+    if (!promotionID || isNaN(promotionID)) {
+      return {
+        status: "Failed",
+        message: "Invalid promotion ID.",
+      };
+    }
+
+    return await this.promotionService.deletePromotion(promotionID);
+  }
+
+  @Put("update")
+  async updatePromotion(
+    @Body()
+    body: {
+      promotionID: number;
+      updates: {
+        content?: string;
+        start_date?: string;
+        end_date?: string;
+        discountRate?: number;
+        useCondition?: string;
+      };
+    },
+  ) {
+    const { promotionID, updates } = body;
+    console.log("Input: Promotion ID:", promotionID);
+    return await this.promotionService.updatePromotion(promotionID, updates);
   }
 }
