@@ -39,4 +39,20 @@ export class ProductController {
   ) {
     return await this.productService.getVariationByProduct(productID);
   }
+
+  @Get("getProductByID")
+  async getProductByID(@Query("productID", ParseIntPipe) productID: number) {
+    return await this.productService.getProductByID(productID);
+  }
+
+  @Get("getVariationByProductAndStore")
+  async getVariationByProductAndStore(
+    @Query("productID", ParseIntPipe) productID: number,
+    @Query("storeID", ParseIntPipe) storeID: number,
+  ) {
+    return await this.productService.getVariationByProductAndStore(
+      productID,
+      storeID,
+    );
+  }
 }

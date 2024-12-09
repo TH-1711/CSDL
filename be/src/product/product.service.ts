@@ -44,6 +44,46 @@ export class ProductService {
     }
   }
 
+  async getProductByID(productID: number) {
+    try {
+      // Validate productID
+      if (!productID || isNaN(productID)) {
+        return {
+          status: "Failed",
+          message: "Error in getProductByID: Invalid product ID.",
+        };
+      }
+
+      // Fetch product by ID
+      const products = await this.prisma.$queryRaw<Product[]>`
+        SELECT 
+          p.id, p.name, p.description, p.discount_for_employee
+        FROM 
+          product p
+        WHERE 
+          p.id = ${productID}`;
+
+      // If no products found, throw an error
+      if (!products || products.length === 0) {
+        throw new Error("No products found for this ID.");
+      }
+
+      // Map the results if necessary (e.g., serialize id)
+      return products.map((product) => ({
+        ...product,
+        id: product.id.toString(),
+        discount_for_employee: product.discount_for_employee.toString(),
+      }))[0];
+    } catch (error) {
+      console.error("Error in getProductByID:", error.message);
+      return {
+        status: "Failed",
+        error: "Failed to fetch product by ID.",
+        message: error.message,
+      };
+    }
+  }
+
   async getProductByCategory(categoryID: number) {
     try {
       // Validate categoryID
@@ -203,6 +243,58 @@ export class ProductService {
       return {
         status: "Failed",
         error: "Failed to fetch product variations.",
+        message: error.message,
+      };
+    }
+  }
+
+  async getVariationByProductAndStore(productID: number, storeID: number) {
+    try {
+      // Fetch variations with their colors and quantities in the given store
+      const variations = await this.prisma.$queryRaw<any[]>`
+        SELECT 
+          v.id AS variationID,
+          v.product_id AS productID,
+          vs.store_id AS storeID,
+          v.size,
+          vc.color,
+          vs.quantity
+        FROM 
+          product_variation v
+        INNER JOIN 
+          variation_in_store vs ON v.id = vs.variation_id
+        INNER JOIN 
+          variation_color vc ON v.id = vc.variation_id AND vc.color = vs.color
+        WHERE 
+          v.product_id = ${productID} AND vs.store_id = ${storeID}
+      `;
+
+      // Group variations by variationID
+      const groupedVariations = variations.reduce((acc, curr) => {
+        const { variationID, productID, storeID, size, color, quantity } = curr;
+
+        if (!acc[variationID]) {
+          acc[variationID] = {
+            variationID,
+            productID,
+            storeID,
+            size,
+            colors: [],
+          };
+        }
+
+        acc[variationID].colors.push({ color, quantity });
+
+        return acc;
+      }, {});
+
+      // Return as an array
+      return Object.values(groupedVariations);
+    } catch (error) {
+      console.error("Error in getVariationByProductAndStore:", error.message);
+      return {
+        status: "Failed",
+        error: "Failed to fetch variations by product and store.",
         message: error.message,
       };
     }
