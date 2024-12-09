@@ -238,6 +238,7 @@
             <option value="6">Túi và ví</option>
             <option value="7">Trang sức</option>
         </select>
+        <button class="add-product-button" onclick="openAddProductModal()">Add Product</button>
     </div>
 
     <br>
@@ -246,6 +247,7 @@
         <div id="product-list" class="product-list"></div>
     </div>
     
+    <!-- Product Details Modal -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle">Product</h3>
@@ -261,13 +263,70 @@
         </div>  
     </div>
 
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Product</h3>
+            <form id="addProductForm">
+                <label for="productId">Product ID:</label>
+                <input type="text" id="productId" name="productId" required><br><br>
 
+                <label for="productName">Product Name:</label>
+                <input type="text" id="productName" name="productName" required><br><br>
 
-    <script src="./script/api.js">
-        
+                <label for="productDesc">Description:</label>
+                <textarea id="productDesc" name="productDesc" required></textarea><br><br>
+
+                <label for="productCategory">Category:</label>
+                <select id="productCategory" name="productCategory" required>
+                    <option value="1">Thời trang nam</option>
+                    <option value="2">Thời trang nữ</option>
+                    <option value="3">Thời trang thể thao</option>
+                    <option value="4">Phụ kiện</option>
+                    <option value="5">Giày dép</option>
+                    <option value="6">Túi và ví</option>
+                    <option value="7">Trang sức</option>
+                </select><br><br>
+
+                <label for="productPrice">Price:</label>
+                <input type="number" id="productPrice" name="productPrice" required><br><br>
+
+                <button type="submit">Add Product</button>
+                <button type="button" onclick="closeAddProductModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'block';
+        }
+
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const productId = document.getElementById('productId').value;
+            const productName = document.getElementById('productName').value;
+            const productDesc = document.getElementById('productDesc').value;
+            const productCategory = document.getElementById('productCategory').value;
+            const productPrice = document.getElementById('productPrice').value;
+
+            // Logic to add the product goes here, e.g., API call
+            console.log({ productId, productName, productDesc, productCategory, productPrice });
+
+            alert('Product added successfully!');
+            closeAddProductModal();
+        });
     </script>
-    
-    
+
     <style>
         .modal {
             display: none;
@@ -305,6 +364,21 @@
             background-color: #45a049;
         }
 
+        .add-product-button {
+            background-color: #f4f7fa;
+            color: rgb(2, 1, 1);
+        }
+
+        .add-product-button:hover {
+            background-color: #0056b3;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
         .product-item {
             cursor: pointer;
             text-align: center;
@@ -317,4 +391,3 @@
         }
     </style>
 </body>
-
