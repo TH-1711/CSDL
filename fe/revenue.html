@@ -1,300 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Monthly Sales Report</title>
     <style>
-        :root {
-            --background-color: #FFD1DC;
-            --header-background: rgb(179, 231, 235);
-            --primary-color: #FF6347;
-            --secondary-color: #000103;
-            --white: #ffffff;
-        }
+      :root {
+        --background-color: #ffd1dc;
+        --header-background: rgb(179, 231, 235);
+        --primary-color: #ff6347;
+        --secondary-color: #000103;
+        --white: #ffffff;
+      }
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            box-sizing: border-box;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--background-color);
+        box-sizing: border-box;
+      }
 
-        .header {
-            background: rgb(179, 231, 235);
-            color: white;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 15px 30px;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
- 
-        .header .logo {
-            width: 100px;
-            height: 50px;
-            background: rgb(179, 231, 235);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #000103;
-            margin-right: 20px;
-        }
+      .header {
+        background: rgb(179, 231, 235);
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 15px 30px;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
-        .header h1 {
-            font-size: 45px;
-            color: #000103;
-            margin: 0;
-            margin-right: 20px;
-            font-family: 'Dancing Script', cursive;
-            font-weight: 700;
-        }
+      .header .logo {
+        width: 100px;
+        height: 50px;
+        background: rgb(179, 231, 235);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #000103;
+        margin-right: 20px;
+      }
 
-        .header .buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end; /* Align buttons to the right */
-            margin-right: 70px; /* Adds space from the right edge */
-        }
+      .header h1 {
+        font-size: 45px;
+        color: #000103;
+        margin: 0;
+        margin-right: 20px;
+        font-family: "Dancing Script", cursive;
+        font-weight: 700;
+      }
 
-        .header .buttons button {
-            background: white;
-            color: #000103;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
+      .header .buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end; /* Align buttons to the right */
+        margin-right: 70px; /* Adds space from the right edge */
+      }
 
-        .header .buttons button:hover {
-            background: #FF6347;
-            color: white;
-        }
+      .header .buttons button {
+        background: white;
+        color: #000103;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.2s;
+      }
 
+      .header .buttons button:hover {
+        background: #ff6347;
+        color: white;
+      }
 
+      .container {
+        max-width: 1200px;
+        margin: 120px auto 0;
+        padding: 20px;
+      }
+
+      .filters {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .filters select {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background-color: var(--primary-color);
+        color: var(--white);
+      }
+
+      td {
+        background-color: #f9f9f9;
+      }
+
+      @media (max-width: 768px) {
         .container {
-            max-width: 1200px;
-            margin: 120px auto 0;
-            padding: 20px;
-        }
-
-        .filters {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .filters select {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+          margin-top: 80px;
         }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+          font-size: 14px;
         }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        td {
-            background-color: #f9f9f9;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin-top: 80px;
-            }
-
-            table {
-                font-size: 14px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <div class="logo">
-            <img src="images/hcmut.png" alt="Logo">
-        </div>
-        <h1>HCMUT Fashion Shop</h1>
-        <div class="buttons">
-            <button onclick="location.href='products.html'">Products</button>
-            <button onclick="location.href='discount.html'">Discount</button>
-            <button onclick="location.href='revenue.html'">Revenue</button>
-        </div>
+      <div class="logo">
+        <img src="images/hcmut.png" alt="Logo" />
+      </div>
+      <h1>HCMUT Fashion Shop</h1>
+      <div class="buttons">
+        <button onclick="location.href='products.html'">Products</button>
+        <button onclick="location.href='discount.html'">Discount</button>
+        <button onclick="location.href='revenue.html'">Revenue</button>
+      </div>
     </div>
 
     <div class="container">
-        <h2>Select Report Parameters</h2>
-        <div class="filters">
-            <label for="storeSelector">Store:</label>
-            <select id="storeSelector" onchange="updateReport()">
-                <option value="store1">Store 1</option>
-                <option value="store2">Store 2</option>
-                <option value="store3">Store 3</option>
-            </select>
+      <h2>Select Report Parameters</h2>
+      <div class="filters">
+        <label for="storeSelector">Store:</label>
+        <select id="storeSelector" onchange="updateReport()">
+          <option value="store1">Store 1</option>
+          <option value="store2">Store 2</option>
+          <option value="store3">Store 3</option>
+        </select>
 
-            <label for="monthSelector">Month:</label>
-            <select id="monthSelector" onchange="updateReport()">
-                <option value="01">January</option>
-                <option value="02">February</option>
-                <option value="03">March</option>
-                <option value="04">April</option>
-                <option value="05">May</option>
-                <option value="06">June</option>
-                <option value="07">July</option>
-                <option value="08">August</option>
-                <option value="09">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
+        <label for="monthSelector">Month:</label>
+        <select id="monthSelector" onchange="updateReport()">
+          <option value="01">January</option>
+          <option value="02">February</option>
+          <option value="03">March</option>
+          <option value="04">April</option>
+          <option value="05">May</option>
+          <option value="06">June</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
 
-            <label for="yearSelector">Year:</label>
-            <select id="yearSelector" onchange="updateReport()">
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-            </select>
-        </div>
+        <label for="yearSelector">Year:</label>
+        <select id="yearSelector" onchange="updateReport()">
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2022">2022</option>
+        </select>
+      </div>
 
-        <div id="reportContainer">
-            <h2>Sales Report - <span id="reportPeriod">December 2024</span></h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Color</th>
-                        <th>Size</th>
-                        <th>Quantity Sold</th>
-                        <th>Total Revenue</th>
-                    </tr>
-                </thead>
-                <tbody id="reportTableBody">
-                    <!-- Dynamic rows will be added here -->
-                </tbody>
-            </table>
+      <div id="reportContainer">
+        <h2>Sales Report - <span id="reportPeriod">December 2024</span></h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Color</th>
+              <th>Size</th>
+              <th>Quantity Sold</th>
+              <th>Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody">
+            <!-- Dynamic rows will be added here -->
+          </tbody>
+        </table>
 
-            <h3 id="totalRevenue">Total Revenue: $0</h3>
-            <h3 id="totalOrders">Total Orders: 0</h3>
-        </div>
+        <h3 id="totalRevenue">Total Revenue: $0</h3>
+        <h3 id="totalOrders">Total Orders: 0</h3>
+      </div>
     </div>
 
     <script>
-        const reports = {
-            store1: {
-                '2024': {
-                    '01': [
-                        { product: 'Jeans', color: 'Blue', size: 'M', quantity: 8, revenue: 240 },
-                        { product: 'Shirt', color: 'Red', size: 'L', quantity: 6, revenue: 180 }
-                    ]
-                }
-            },
-            store2: {
-                '2024': {
-                    '01': [
-                        { product: 'Jeans', color: 'Blue', size: 'M', quantity: 10, revenue: 300 },
-                        { product: 'Shirt', color: 'Blue', size: 'M', quantity: 5, revenue: 150 }
-                    ],
-                    '12': [
-                        { product: 'Jeans', color: 'Blue', size: 'M', quantity: 8, revenue: 240 },
-                        { product: 'Shirt', variant: 'Red - L', quantity: 6, revenue: 180 }
-                    ]
-                },
-                '2023': {
-                    '12': [
-                        { product: 'Jeans', color: 'Blue', size: 'M', quantity: 7, revenue: 210 },
-                        { product: 'Shirt', color: 'Blue', size: 'M', quantity: 4, revenue: 120 }
-                    ]
-                }
-            },
-            store3: {
+      const reports = {
+        store1: {
+          2024: {
+            "01": [
+              {
+                product: "Jeans",
+                color: "Blue",
+                size: "M",
+                quantity: 8,
+                revenue: 240,
+              },
+              {
+                product: "Shirt",
+                color: "Red",
+                size: "L",
+                quantity: 6,
+                revenue: 180,
+              },
+            ],
+          },
+        },
+        store2: {
+          2024: {
+            "01": [
+              {
+                product: "Jeans",
+                color: "Blue",
+                size: "M",
+                quantity: 10,
+                revenue: 300,
+              },
+              {
+                product: "Shirt",
+                color: "Blue",
+                size: "M",
+                quantity: 5,
+                revenue: 150,
+              },
+            ],
+            12: [
+              {
+                product: "Jeans",
+                color: "Blue",
+                size: "M",
+                quantity: 8,
+                revenue: 240,
+              },
+              {
+                product: "Shirt",
+                variant: "Red - L",
+                quantity: 6,
+                revenue: 180,
+              },
+            ],
+          },
+          2023: {
+            12: [
+              {
+                product: "Jeans",
+                color: "Blue",
+                size: "M",
+                quantity: 7,
+                revenue: 210,
+              },
+              {
+                product: "Shirt",
+                color: "Blue",
+                size: "M",
+                quantity: 4,
+                revenue: 120,
+              },
+            ],
+          },
+        },
+        store3: {},
+      };
 
-            }
-        };
+      function updateReport() {
+        const store = document.getElementById("storeSelector").value;
+        const month = document.getElementById("monthSelector").value;
+        const year = document.getElementById("yearSelector").value;
 
-        function updateReport() {
-            const store = document.getElementById('storeSelector').value;
-            const month = document.getElementById('monthSelector').value;
-            const year = document.getElementById('yearSelector').value;
+        const reportTableBody = document.getElementById("reportTableBody");
+        const totalRevenueElem = document.getElementById("totalRevenue");
+        const totalOrdersElem = document.getElementById("totalOrders");
+        const reportPeriodElem = document.getElementById("reportPeriod");
 
-            const reportTableBody = document.getElementById('reportTableBody');
-            const totalRevenueElem = document.getElementById('totalRevenue');
-            const totalOrdersElem = document.getElementById('totalOrders');
-            const reportPeriodElem = document.getElementById('reportPeriod');
+        const data = reports[store]?.[year]?.[month] || [];
 
-            const data = reports[store]?.[year]?.[month] || [];
+        reportTableBody.innerHTML = "";
+        let totalRevenue = 0;
+        let totalOrders = 0;
 
-            reportTableBody.innerHTML = '';
-            let totalRevenue = 0;
-            let totalOrders = 0;
-
-            data.forEach(({ product, color, size, quantity, revenue }) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
+        data.forEach(({ product, color, size, quantity, revenue }) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
                     <td>${product}</td>
                     <td>${color}</td>
                     <td>${size}</td>
                     <td>${quantity}</td>
                     <td>$${revenue}</td>
                 `;
-                reportTableBody.appendChild(row);
-                totalRevenue += revenue;
-                totalOrders += quantity;
-            });
+          reportTableBody.appendChild(row);
+          totalRevenue += revenue;
+          totalOrders += quantity;
+        });
 
-            reportPeriodElem.textContent = `${getMonthName(month)} ${year}`;
-            totalRevenueElem.textContent = `Total Revenue: $${totalRevenue}`;
-            totalOrdersElem.textContent = `Total Orders: ${totalOrders}`;
-        }
+        reportPeriodElem.textContent = `${getMonthName(month)} ${year}`;
+        totalRevenueElem.textContent = `Total Revenue: $${totalRevenue}`;
+        totalOrdersElem.textContent = `Total Orders: ${totalOrders}`;
+      }
 
-        function getMonthName(month) {
-            const months = {
-                '01': 'January',
-                '02': 'February',
-                '03': 'March',
-                '04': 'April',
-                '05': 'May',
-                '06': 'June',
-                '07': 'July',
-                '08': 'August',
-                '09': 'September',
-                '10': 'October',
-                '11': 'November',
-                '12': 'December'
-            };
-            return months[month];
-        }
+      function getMonthName(month) {
+        const months = {
+          "01": "January",
+          "02": "February",
+          "03": "March",
+          "04": "April",
+          "05": "May",
+          "06": "June",
+          "07": "July",
+          "08": "August",
+          "09": "September",
+          10: "October",
+          11: "November",
+          12: "December",
+        };
+        return months[month];
+      }
 
-        // Initialize with first store's report
-        document.addEventListener("DOMContentLoaded", updateReport);
+      // Initialize with first store's report
+      document.addEventListener("DOMContentLoaded", updateReport);
     </script>
-</body>
+  </body>
 </html>
-

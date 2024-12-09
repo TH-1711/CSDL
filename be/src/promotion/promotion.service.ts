@@ -70,10 +70,10 @@ export class PromotionService {
     try {
       // First, call the stored procedure
       await this.prisma.$executeRawUnsafe(`
-        CALL AddNewPromotion('${content}', '${start_date}', '${end_date}',@new_id);
+        CALL AddNewPromotion('${content}', '${start_date}', '${end_date}', @new_id);
       `);
 
-      // Then, fetch the result from the session variable ---> This can be improved by returning only the newID
+      // Then, fetch the result from the session variable
       const result = await this.prisma.$queryRaw<Promotion[]>`
         SELECT * from promotion WHERE id = @new_id;
       `;
@@ -83,11 +83,17 @@ export class PromotionService {
         ...promotion,
         id: promotion.id.toString(),
       }));
-    } catch (error) {
+    } catch (error: any) {
+      // Extract only the specific message about start_date and end_date
+      const detailedMessageMatch = error.message.match(/Message: `(.+?)`/);
+      const detailedMessage = detailedMessageMatch
+        ? detailedMessageMatch[1]
+        : "An unexpected error occurred.";
+
       console.error("Error creating promotion:", error);
       return {
         status: "Failed",
-        message: `Error creating promotion: ${error.message}`,
+        message: detailedMessage,
       };
     }
   }

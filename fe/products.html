@@ -1,423 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product Page</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #FFD1DC; /* Hồng nhạt */
-            box-sizing: border-box;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #ffd1dc; /* Hồng nhạt */
+        box-sizing: border-box;
+      }
 
-        /* Header Styling */
-        .header {
-            background: rgb(179, 231, 235);
-            color: white;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 15px 30px;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
- 
-        .header .logo {
-            width: 100px;
-            height: 50px;
-            background: rgb(179, 231, 235);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #000103;
-            margin-right: 20px;
-        }
+      /* Header Styling */
+      .header {
+        background: rgb(179, 231, 235);
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 15px 30px;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
-        .header h1 {
-            font-size: 45px;
-            color: #000103;
-            margin: 0;
-            margin-right: 20px;
-            font-family: 'Dancing Script', cursive;
-            font-weight: 700;
-        }
+      .header .logo {
+        width: 100px;
+        height: 50px;
+        background: rgb(179, 231, 235);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #000103;
+        margin-right: 20px;
+      }
 
-        .header .buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end; /* Align buttons to the right */
-            margin-right: 70px; /* Adds space from the right edge */
-        }
+      .header h1 {
+        font-size: 45px;
+        color: #000103;
+        margin: 0;
+        margin-right: 20px;
+        font-family: "Dancing Script", cursive;
+        font-weight: 700;
+      }
 
-        .header .buttons button {
-            background: white;
-            color: #000103;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
+      .header .buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end; /* Align buttons to the right */
+        margin-right: 70px; /* Adds space from the right edge */
+      }
 
-        .header .buttons button:hover {
-            background: #FF6347;
-            color: white;
-        }
+      .header .buttons button {
+        background: white;
+        color: #000103;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.2s;
+      }
 
-        /* Filters Section */
-        .filters {
-            background: #FFD1DC;
-            padding: 15px 30px;
-            /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
-            display: flex;
-            gap: 20px;
-            justify-content: left;
-            align-items: center;
-            margin-top: 80px; /* To provide space below the header */
-        }
+      .header .buttons button:hover {
+        background: #ff6347;
+        color: white;
+      }
 
-        .filters select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
+      /* Filters Section */
+      .filters {
+        background: #ffd1dc;
+        padding: 15px 30px;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        display: flex;
+        gap: 20px;
+        justify-content: left;
+        align-items: center;
+        margin-top: 80px; /* To provide space below the header */
+      }
 
-        /* Container to ensure spacing below fixed header */
-        .container {
-            max-width: 1200px;
-            margin: 40px auto 0; /* Adjusted margin-top for new elements */
-            padding: 20px;
-        }
+      .filters select {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+      }
 
-        /* Grid for Product List */
+      /* Container to ensure spacing below fixed header */
+      .container {
+        max-width: 1200px;
+        margin: 40px auto 0; /* Adjusted margin-top for new elements */
+        padding: 20px;
+      }
+
+      /* Grid for Product List */
+      .product-list {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+
+      /* Product Item Styling */
+      .product-item {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .product-item:hover {
+        transform: scale(1.05);
+      }
+
+      .product-item img {
+        width: 90%;
+        max-height: 400px;
+        object-fit: contain;
+        margin-bottom: 10px;
+      }
+
+      .product-item h3 {
+        margin: 10px 0;
+        font-size: 18px;
+        color: #333;
+      }
+
+      /* Modal Styling */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+      }
+
+      .modal-content h3 {
+        margin-bottom: 15px;
+        font-size: 20px;
+      }
+
+      .variant {
+        margin-bottom: 10px;
+      }
+
+      .variant span {
+        display: inline-block;
+        margin: 5px;
+        padding: 5px 10px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .variant span:hover {
+        background: #ddd;
+      }
+
+      .modal-close {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: #ff7f50;
+        border: none;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .modal-close:hover {
+        background: #ff6347;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
         .product-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+          grid-template-columns: 1fr;
         }
-
-        /* Product Item Styling */
-        .product-item {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .product-item:hover {
-            transform: scale(1.05);
-        }
-
-        .product-item img {
-            width: 90%;
-            max-height: 400px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .product-item h3 {
-            margin: 10px 0;
-            font-size: 18px;
-            color: #333;
-        }
-
-        /* Modal Styling */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .variant {
-            margin-bottom: 10px;
-        }
-
-        .variant span {
-            display: inline-block;
-            margin: 5px;
-            padding: 5px 10px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .variant span:hover {
-            background: #ddd;
-        }
-
-        .modal-close {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #FF7F50;
-            border: none;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .modal-close:hover {
-            background: #FF6347;
-        }
-
-
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .product-list {
-                grid-template-columns: 1fr;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-
-<body>
-
+  <body>
     <div class="header">
-        <div class="logo">
-            <img src="images/hcmut.png" alt="Logo">
-        </div>
-        <h1>HCMUT Fashion Shop</h1>
-        <div class="buttons">
-            <button onclick="location.href='products.html'">Products</button>
-            <button onclick="location.href='discount.html'">Discount</button>
-            <button onclick="location.href='revenue.html'">Revenue</button>
-        </div>
+      <div class="logo">
+        <img src="images/hcmut.png" alt="Logo" />
+      </div>
+      <h1>HCMUT Fashion Shop</h1>
+      <div class="buttons">
+        <button onclick="location.href='products.html'">Products</button>
+        <button onclick="location.href='discount.html'">Discount</button>
+        <button onclick="location.href='revenue.html'">Revenue</button>
+      </div>
     </div>
 
     <div class="filters">
-        <select id="storeSelect" onchange="filterProducts()">
-            <option value="all">Tất cả cửa hàng</option>
-            <option value="10001">Cửa hàng 1</option>
-            <option value="10002">Cửa hàng 2</option>
-            <option value="10003">Cửa hàng 3</option>
-        </select>
-        <select id="categorySelect" onchange="filterProducts()">
-            <option value="all">Tất cả</option>
+      <select id="storeSelect" onchange="filterProducts()">
+        <option value="all">Tất cả cửa hàng</option>
+        <option value="10001">Cửa hàng 1</option>
+        <option value="10002">Cửa hàng 2</option>
+        <option value="10003">Cửa hàng 3</option>
+      </select>
+      <select id="categorySelect" onchange="filterProducts()">
+        <option value="all">Tất cả</option>
+        <option value="1">Thời trang nam</option>
+        <option value="2">Thời trang nữ</option>
+        <option value="3">Thời trang thể thao</option>
+        <option value="4">Phụ kiện</option>
+        <option value="5">Giày dép</option>
+        <option value="6">Túi và ví</option>
+        <option value="7">Trang sức</option>
+      </select>
+      <button class="add-product-button" onclick="openAddProductModal()">
+        Add Product
+      </button>
+    </div>
+
+    <br />
+
+    <div class="container">
+      <div id="product-list" class="product-list"></div>
+    </div>
+
+    <div id="productModal" class="modal">
+      <div class="modal-content">
+        <h3 id="modalTitle">Product</h3>
+
+        <p id="modalPrice"><strong>Price:</strong></p>
+        <div class="variant colors">
+          <!-- Dynamic color list will appear here -->
+        </div>
+        <div class="variant sizes">
+          <!-- Dynamic size list will appear here -->
+        </div>
+        <button class="modal-close" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+
+    <div id="addProductModal" class="modal">
+      <div class="modal-content">
+        <h3>Add New Product</h3>
+        <form id="addProductForm">
+          <label for="productId">Product ID:</label>
+          <input
+            type="text"
+            id="productId"
+            name="productId"
+            required
+          /><br /><br />
+          <label for="productName">Product Name:</label>
+          <input
+            type="text"
+            id="productName"
+            name="productName"
+            required
+          /><br /><br />
+          <label for="productDesc">Description:</label>
+          <textarea id="productDesc" name="productDesc" required></textarea
+          ><br /><br />
+          <label for="productCategory">Category:</label>
+          <select id="productCategory" name="productCategory" required>
             <option value="1">Thời trang nam</option>
             <option value="2">Thời trang nữ</option>
             <option value="3">Thời trang thể thao</option>
             <option value="4">Phụ kiện</option>
             <option value="5">Giày dép</option>
             <option value="6">Túi và ví</option>
-            <option value="7">Trang sức</option>
-        </select>
-        <button class="add-product-button" onclick="openAddProductModal()">Add Product</button>
-        <button class="show-discount-button" onclick="showDiscountProducts()">Show Discounts</button>
+            <option value="7">Trang sức</option></select
+          ><br /><br />
+          <label for="productPrice">Price:</label>
+          <input
+            type="number"
+            id="productPrice"
+            name="productPrice"
+            required
+          /><br /><br />
+          <button type="submit">Add Product</button>
+          <button type="button" onclick="closeAddProductModal()">Cancel</button>
+        </form>
+      </div>
     </div>
 
-    <br>
-
-    <div class="container">
-        <div id="product-list" class="product-list"></div>
-    </div>
-    
-
-    
-
-    <!-- Product Details Modal -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle">Product</h3>
-            
-            <p id="modalPrice"><strong>Price:</strong></p>
-            <div class="variant colors">
-                <!-- Dynamic color list will appear here -->
-            </div>
-            <div class="variant sizes">
-                <!-- Dynamic size list will appear here -->
-            </div>
-            <button class="modal-close" onclick="closeModal()">Close</button>
-        </div>  
-    </div>
-
-
-
-
-    <!-- Add Product Modal -->
-    <div id="addProductModal" class="modal">
-        <div class="modal-content">
-            <h3>Add New Product</h3>
-            <form id="addProductForm">
-                <label for="productId">Product ID:</label>
-                <input type="text" id="productId" name="productId" required><br><br>
-
-                <label for="productName">Product Name:</label>
-                <input type="text" id="productName" name="productName" required><br><br>
-
-                <label for="productDesc">Description:</label>
-                <textarea id="productDesc" name="productDesc" required></textarea><br><br>
-
-                <label for="productCategory">Category:</label>
-                <select id="productCategory" name="productCategory" required>
-                    <option value="1">Thời trang nam</option>
-                    <option value="2">Thời trang nữ</option>
-                    <option value="3">Thời trang thể thao</option>
-                    <option value="4">Phụ kiện</option>
-                    <option value="5">Giày dép</option>
-                    <option value="6">Túi và ví</option>
-                    <option value="7">Trang sức</option>
-                </select><br><br>
-
-                <label for="productPrice">Price:</label>
-                <input type="number" id="productPrice" name="productPrice" required><br><br>
-
-                <button type="submit">Add Product</button>
-                <button type="button" onclick="closeAddProductModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-
-
-
-    
-    <script>
-        function openAddProductModal() {
-            document.getElementById('addProductModal').style.display = 'block';
-        }
-
-        function closeAddProductModal() {
-            document.getElementById('addProductModal').style.display = 'none';
-        }
-
-        function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
-        }
-
-        function showDiscountProducts() {
-            // Placeholder logic for displaying discount products
-            alert('Displaying discount products!');
-
-      
-            
-        }
-
-        document.getElementById('addProductForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const productId = document.getElementById('productId').value;
-            const productName = document.getElementById('productName').value;
-            const productDesc = document.getElementById('productDesc').value;
-            const productCategory = document.getElementById('productCategory').value;
-            const productPrice = document.getElementById('productPrice').value;
-
-            // Logic to add the product goes here, e.g., API call
-            console.log({ productId, productName, productDesc, productCategory, productPrice });
-
-            alert('Product added successfully!');
-            closeAddProductModal();
-        });
-    </script>
+    <script src="./script/api.js"></script>
 
     <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
+      .add-product-button {
+        background-color: #f4f7fa;
+        color: rgb(2, 1, 1);
+      }
+      .add-product-button:hover {
+        background-color: #0056b3;
+      }
+      .filters {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
 
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            margin: 10% auto;
-            width: 50%;
-            border-radius: 8px;
-        }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
 
-        .variant span {
-            margin-right: 10px;
-            display: inline-block;
-        }
+      .modal-content {
+        background-color: white;
+        padding: 20px;
+        margin: 10% auto;
+        width: 50%;
+        border-radius: 8px;
+      }
 
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+      .variant span {
+        margin-right: 10px;
+        display: inline-block;
+      }
 
-        button:hover {
-            background-color: #45a049;
-        }
+      button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
 
-        .add-product-button {
-            background-color: #f4f7fa;
-            color: rgb(2, 1, 1);
-        }
+      button:hover {
+        background-color: #45a049;
+      }
 
-        .add-product-button:hover {
-            background-color: #0056b3;
-        }
+      .product-item {
+        cursor: pointer;
+        text-align: center;
+        margin: 10px;
+      }
 
-        .show-discount-button {
-            background-color: #faf9f6;
-            color: #000;
-        }
-
-        .show-discount-button:hover {
-            background-color: #f8f7f4;
-        }
-
-        .filters {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .product-item {
-            cursor: pointer;
-            text-align: center;
-            margin: 10px;
-        }
-
-        .product-item img {
-            width: 100px;
-            height: auto;
-        }
+      .product-item img {
+        width: 100px;
+        height: auto;
+      }
     </style>
-</body>
+  </body>
+</html>

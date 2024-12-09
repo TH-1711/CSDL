@@ -6,7 +6,9 @@ interface Product {
   name: string;
   description: string;
   discount_for_employee: number;
-  store_id: number;
+  catalog_id: number;
+  catalog_name: string;
+  store_id: string;
   store_name: string;
 }
 
@@ -115,6 +117,7 @@ export class ProductService {
         ...product,
         id: product.id.toString(),
         discount_for_employee: product.discount_for_employee.toString(),
+        categoryID: categoryID.toString(),
       }));
     } catch (error) {
       console.error("Error in productByCategory:", error.message);
@@ -191,8 +194,7 @@ export class ProductService {
       return products.map((product) => ({
         ...product,
         id: product.id.toString(),
-        store_id: product.store_id.toString(),
-        store_name: product.store_name,
+        categoryID: categoryID.toString(),
       }));
     } catch (error) {
       console.error("Error in getProductsByStoreAndCategory:", error);
@@ -296,6 +298,80 @@ export class ProductService {
         status: "Failed",
         error: "Failed to fetch variations by product and store.",
         message: error.message,
+      };
+    }
+  }
+
+  async createProduct(
+    catalogId: number,
+    name: string,
+    description: string,
+    discountForEmployee: number,
+  ) {
+    try {
+      // Sử dụng Prisma để truyền tham số an toàn
+      await this.prisma.$executeRawUnsafe(
+        `
+        CALL AddProduct(?, ?, ?, ?, @new_product_id);
+      `,
+        catalogId,
+        name,
+        description,
+        discountForEmployee,
+      );
+
+      // Lấy giá trị từ biến session
+      const result = await this.prisma.$queryRaw<Product[]>`
+        SELECT * FROM product WHERE id = (SELECT @new_product_id);
+      `;
+
+      if (!result || result.length === 0) {
+        return {
+          status: "Failed",
+          message: "Error in addProduct: Product not added.",
+        };
+      }
+
+      const product = result[0];
+
+      return {
+        status: "Success",
+        productID: product.id,
+      };
+    } catch (error) {
+      console.error("Error in addProduct:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in addProduct: " + error.message,
+      };
+    }
+  }
+
+  async createVariation(
+    productId: number,
+    originPrice: number,
+    size: "S" | "M" | "L" | "D",
+  ) {
+    try {
+      // Call the stored procedure to insert a product variation
+      await this.prisma.$executeRawUnsafe<any[]>(`
+        CALL insertProductVariation(${productId}, ${originPrice}, ${size}, @new_variation_id);
+      `);
+
+      // Fetch the result from the session variable
+      const result = await this.prisma.$queryRaw<ProductVariation>`
+        SELECT * from product_variation WHERE id = @new_variation_id;
+      `;
+      if (!result || !result.id) {
+        throw new Error("Failed to retrieve the new variation ID.");
+      }
+
+      return { status: "Success", variationID: result.id };
+    } catch (error) {
+      console.error("Error in insertProductVariation:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in insertProductVariation: " + error.message,
       };
     }
   }

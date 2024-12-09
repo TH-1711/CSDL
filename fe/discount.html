@@ -269,12 +269,44 @@
     </div>
 
     <script>
+
+        function createDiscount() {
+            // Get input values
+            const contentPromo = document.getElementById('contentPromo').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // Validate inputs
+            if (!contentPromo || !startDate || !endDate) {
+            alert("Please fill out all fields.");
+            return;
+            }
+
+            // Simulate creating the discount (you can replace this with an API call)
+            console.log("Creating discount:", { contentPromo, startDate, endDate });
+
+            // Update the summary
+            const promoSummary = document.getElementById('promoSummary');
+            promoSummary.style.display = 'block';
+            document.getElementById('summaryCode').textContent = contentPromo;
+            document.getElementById('summaryDiscount').textContent = "TBD"; // Add discount value if available
+            document.getElementById('summaryProducts').textContent = "TBD"; // Add applicable products if available
+            document.getElementById('summaryDescription').textContent = `Valid from ${startDate} to ${endDate}`;
+
+            // Clear form inputs
+            document.getElementById('contentPromo').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+
+            alert("Discount created successfully!");
+        }
+
         function showCreateDiscount() {
             document.getElementById("createDiscountForm").style.display = "block";
-            document.getElementById("applyDiscountForm").style.display = "none";
+            // document.getElementById("applyDiscountForm").style.display = "none";
 
             document.getElementById("createDiscountBtn").classList.add("active");
-            document.getElementById("applyDiscountBtn").classList.remove("active");
+            // document.getElementById("applyDiscountBtn").classList.remove("active");
         }        
 
         function showApplyDiscount() {
