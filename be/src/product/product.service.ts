@@ -355,18 +355,20 @@ export class ProductService {
     try {
       // Call the stored procedure to insert a product variation
       await this.prisma.$executeRawUnsafe<any[]>(`
-        CALL insertProductVariation(${productId}, ${originPrice}, ${size}, @new_variation_id);
+        CALL insertProductVariation(${productId}, ${originPrice}, '${size}'COLLATE utf8mb4_unicode_ci , @new_variation_id);
       `);
 
       // Fetch the result from the session variable
       const result = await this.prisma.$queryRaw<ProductVariation>`
-        SELECT * from product_variation WHERE id = @new_variation_id;
+        SELECT * from product_variation WHERE id = @new_variation_id COLLATE utf8mb4_unicode_ci;
       `;
-      if (!result || !result.id) {
+      console.log("Result:", result);
+      const variation = result[0];
+      if (!variation || !variation.id) {
         throw new Error("Failed to retrieve the new variation ID.");
       }
 
-      return { status: "Success", variationID: result.id };
+      return { status: "Success", ...variation };
     } catch (error) {
       console.error("Error in insertProductVariation:", error.message);
       return {
