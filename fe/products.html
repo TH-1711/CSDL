@@ -197,6 +197,8 @@
             background: #FF6347;
         }
 
+
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .product-list {
@@ -239,6 +241,7 @@
             <option value="7">Trang sức</option>
         </select>
         <button class="add-product-button" onclick="openAddProductModal()">Add Product</button>
+        <button class="show-discount-button" onclick="showDiscountProducts()">Show Discounts</button>
     </div>
 
     <br>
@@ -247,6 +250,9 @@
         <div id="product-list" class="product-list"></div>
     </div>
     
+
+    
+
     <!-- Product Details Modal -->
     <div id="productModal" class="modal">
         <div class="modal-content">
@@ -262,6 +268,9 @@
             <button class="modal-close" onclick="closeModal()">Close</button>
         </div>  
     </div>
+
+
+
 
     <!-- Add Product Modal -->
     <div id="addProductModal" class="modal">
@@ -297,6 +306,10 @@
         </div>
     </div>
 
+
+
+
+    
     <script>
         function openAddProductModal() {
             document.getElementById('addProductModal').style.display = 'block';
@@ -308,6 +321,14 @@
 
         function closeModal() {
             document.getElementById('productModal').style.display = 'none';
+        }
+
+        function showDiscountProducts() {
+            // Placeholder logic for displaying discount products
+            alert('Displaying discount products!');
+
+      
+            
         }
 
         document.getElementById('addProductForm').addEventListener('submit', function(e) {
@@ -371,6 +392,15 @@
 
         .add-product-button:hover {
             background-color: #0056b3;
+        }
+
+        .show-discount-button {
+            background-color: #faf9f6;
+            color: #000;
+        }
+
+        .show-discount-button:hover {
+            background-color: #f8f7f4;
         }
 
         .filters {
