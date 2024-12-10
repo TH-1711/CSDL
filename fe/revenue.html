@@ -12,7 +12,7 @@
     <style>
       :root {
         --background-color: #ffd1dc;
-        --header-background: rgb(179, 231, 235);
+        --header-background: rgb(3, 7, 7);
         --primary-color: #ff6347;
         --secondary-color: #000103;
         --white: #ffffff;
@@ -86,7 +86,7 @@
         color: white;
       }
 
-      .container {
+      .ParameterSelect {
         max-width: 1200px;
         margin: 120px auto 0;
         padding: 20px;
@@ -100,7 +100,7 @@
         align-items: center;
       }
 
-      .filters select {
+      .filters select,.filters input, .filters button {
         padding: 10px;
         font-size: 16px;
         border-radius: 4px;
@@ -130,7 +130,7 @@
       }
 
       @media (max-width: 768px) {
-        .container {
+        .ParameterSelect {
           margin-top: 80px;
         }
 
@@ -153,54 +153,80 @@
       </div>
     </div>
 
-    <div class="container">
-      <h2>Select Report Parameters</h2>
-      <div class="filters">
-        <label for="storeSelector">Store:</label>
-        <select id="storeSelector" onchange="updateReport()">
-          <option value="store1">Store 1</option>
-          <option value="store2">Store 2</option>
-          <option value="store3">Store 3</option>
-        </select>
-
-        <label for="monthSelector">Month:</label>
-        <select id="monthSelector" onchange="updateReport()">
-          <option value="01">January</option>
-          <option value="02">February</option>
-          <option value="03">March</option>
-          <option value="04">April</option>
-          <option value="05">May</option>
-          <option value="06">June</option>
-          <option value="07">July</option>
-          <option value="08">August</option>
-          <option value="09">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-
-        <label for="yearSelector">Year:</label>
-        <select id="yearSelector" onchange="updateReport()">
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
-          <option value="2022">2022</option>
-        </select>
-      </div>
+    <div class="ParameterSelect">
+        <h2>Select Report Parameters</h2>
+        <div class="filters">
+            <label for="storeSelector">Store:</label>
+            <select id="storeSelector">
+                <option value="storeAll">All</option>
+                <option value="store1">Store 1</option>
+                <option value="store2">Store 2</option>
+                <option value="store3">Store 3</option>
+            </select>
+    
+            <label for="monthSelector">Month:</label>
+            <select id="monthSelector">
+                <option value="monthAll">All</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+    
+            <label for="yearSelector">Year:</label>
+            <input type="text" id="yearSelector" placeholder="Enter Year" />
+        <button id="submitBtn">Submit</button> 
+        </div>
+        
+    </div>
 
       <div id="reportContainer">
-        <h2>Sales Report - <span id="reportPeriod">December 2024</span></h2>
-        <table>
+        <h2 style="text-align: center;">
+            Sales Report
+            <br>
+            <span id="reportPeriod"> Store: All Stores - Month: All Months - Year: All Years </span>
+          </h2>
+        <table
+          border="1"
+          style="border-collapse: collapse; text-align: center"
+          id="reportTable"
+          class="report-table"
+        >
+          <colgroup>
+            <col style="width: 20vw" />
+            <col style="width: 15vw" />
+            <col style="width: 7.5vw" />
+            <col style="width: 7.5vw" />
+            <col style="width: 7.5vw" />
+            <col style="width: 7.5vw" />
+            <col style="width: 17.5vw" />
+            <col style="width: 17.5vw" />
+          </colgroup>
           <thead>
             <tr>
-              <th>Product Name</th>
-              <th>Color</th>
-              <th>Size</th>
-              <th>Quantity Sold</th>
-              <th>Total Revenue</th>
+              <th rowspan="2">Product Name</th>
+              <th rowspan="2">Color</th>
+              <th colspan="4">Size</th>
+              <th rowspan="2">Quantity Sold</th>
+              <th rowspan="2">Total Revenue</th>
+            </tr>
+            <tr>
+              <th>S</th>
+              <th>M</th>
+              <th>L</th>
+              <th>D</th>
             </tr>
           </thead>
-          <tbody id="reportTableBody">
-            <!-- Dynamic rows will be added here -->
+
+          <tbody>
           </tbody>
         </table>
 
@@ -210,117 +236,136 @@
     </div>
 
     <script>
-      const reports = {
-        store1: {
-          2024: {
-            "01": [
-              {
-                product: "Jeans",
-                color: "Blue",
-                size: "M",
-                quantity: 8,
-                revenue: 240,
-              },
-              {
-                product: "Shirt",
-                color: "Red",
-                size: "L",
-                quantity: 6,
-                revenue: 180,
-              },
-            ],
-          },
-        },
-        store2: {
-          2024: {
-            "01": [
-              {
-                product: "Jeans",
-                color: "Blue",
-                size: "M",
-                quantity: 10,
-                revenue: 300,
-              },
-              {
-                product: "Shirt",
-                color: "Blue",
-                size: "M",
-                quantity: 5,
-                revenue: 150,
-              },
-            ],
-            12: [
-              {
-                product: "Jeans",
-                color: "Blue",
-                size: "M",
-                quantity: 8,
-                revenue: 240,
-              },
-              {
-                product: "Shirt",
-                variant: "Red - L",
-                quantity: 6,
-                revenue: 180,
-              },
-            ],
-          },
-          2023: {
-            12: [
-              {
-                product: "Jeans",
-                color: "Blue",
-                size: "M",
-                quantity: 7,
-                revenue: 210,
-              },
-              {
-                product: "Shirt",
-                color: "Blue",
-                size: "M",
-                quantity: 4,
-                revenue: 120,
-              },
-            ],
-          },
-        },
-        store3: {},
-      };
+    //   function updateReport() {
+    //     const store = document.getElementById("storeSelector").value;
+    //     const month = document.getElementById("monthSelector").value;
+    //     const year = document.getElementById("yearSelector").value;
 
-      function updateReport() {
-        const store = document.getElementById("storeSelector").value;
-        const month = document.getElementById("monthSelector").value;
-        const year = document.getElementById("yearSelector").value;
+    //     const reportTableBody = document.getElementById("reportTableBody");
+    //     const totalRevenueElem = document.getElementById("totalRevenue");
+    //     const totalOrdersElem = document.getElementById("totalOrders");
+    //     const reportPeriodElem = document.getElementById("reportPeriod");
 
-        const reportTableBody = document.getElementById("reportTableBody");
-        const totalRevenueElem = document.getElementById("totalRevenue");
-        const totalOrdersElem = document.getElementById("totalOrders");
-        const reportPeriodElem = document.getElementById("reportPeriod");
+    //     const data = reports[store]?.[year]?.[month] || [];
 
-        const data = reports[store]?.[year]?.[month] || [];
+    //     reportTableBody.innerHTML = "";
+    //     let totalRevenue = 0;
+    //     let totalOrders = 0;
 
-        reportTableBody.innerHTML = "";
-        let totalRevenue = 0;
-        let totalOrders = 0;
+    //     data.forEach(({ product, color, size, quantity, revenue }) => {
+    //       const row = document.createElement("tr");
+    //       row.innerHTML = `
+    //                 <td>${product}</td>
+    //                 <td>${color}</td>
+    //                 <td>${size}</td>
+    //                 <td>${quantity}</td>
+    //                 <td>$${revenue}</td>
+    //             `;
+    //       reportTableBody.appendChild(row);
+    //       totalRevenue += revenue;
+    //       totalOrders += quantity;
+    //     });
 
-        data.forEach(({ product, color, size, quantity, revenue }) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-                    <td>${product}</td>
-                    <td>${color}</td>
-                    <td>${size}</td>
-                    <td>${quantity}</td>
-                    <td>$${revenue}</td>
-                `;
-          reportTableBody.appendChild(row);
-          totalRevenue += revenue;
-          totalOrders += quantity;
+    //     reportPeriodElem.textContent = `${getMonthName(month)} ${year}`;
+    //     totalRevenueElem.textContent = `Total Revenue: $${totalRevenue}`;
+    //     totalOrdersElem.textContent = `Total Orders: ${totalOrders}`;
+    //   }
+
+    document.addEventListener("DOMContentLoaded", function() {
+    const storeSelector = document.getElementById("storeSelector");
+    const monthSelector = document.getElementById("monthSelector");
+    const yearSelector = document.getElementById("yearSelector");
+    const submitBtn = document.getElementById("submitBtn"); // Nút submit mới
+    const reportTable = document.getElementById("reportTable");
+    const reportPeriod = document.getElementById("reportPeriod");
+    const totalRevenue = document.getElementById("totalRevenue");
+    const totalOrders = document.getElementById("totalOrders");
+
+    // Lắng nghe sự kiện bấm nút submit
+    submitBtn.addEventListener("click", async () => {
+        // const storeID = storeSelector.value;
+        let storeID="storeAll";
+        const month = monthSelector.value;
+        const year = yearSelector.value;
+
+        // Kiểm tra xem có đủ thông tin để gọi API không
+        const parameter="";
+        console.log("storeID:",storeID);
+        console.log("month:",month);
+        console.log("year:",year);
+        if(storeID!="storeAll") parameter+=`storeID=${storeID}&`;
+        if(month!="monthAll") parameter+=`month=${getMonthName(month)}&`;
+        if(year!="") parameter+=`year=${year}`;
+        if(parameter!="") parameter='?'+parameter;
+        console.log("parameter:",parameter);
+        // URL API
+        const api_url = "http://localhost:3000/api"; // Thay thế với URL của API
+        const url = `${api_url}/revenue/get${parameter}`;
+
+        try {
+        // Gọi API
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("data:",data);
+
+        // Cập nhật tiêu đề báo cáo
+        textContent = "";
+        if (storeID === "storeAll") {
+            textContent += "Store: All Stores - ";
+        } else {
+            textContent += `Store: ${storeID} - `;
+        }
+        if(month === "monthAll") {
+            textContent += "Month: All Months - ";
+        } else {
+            textContent += `Month: ${getMonthName(month)} - `;
+        }
+        if (year === "") {
+            textContent += "Year: All Years";
+        } else {
+            textContent += `Year: ${year}`;
+        }
+        reportPeriod.textContent = textContent;
+
+        // Xóa dữ liệu cũ trong bảng
+        reportTable.querySelector("tbody").innerHTML = "";
+
+        let totalRevenueAmount = 0;
+        let totalOrdersCount = 0;
+
+        // Lặp qua dữ liệu trả về và hiển thị trong bảng
+        data.forEach(product => {
+            const row = document.createElement("tr");
+
+            // Tạo các ô cho từng row: Product, Size, Color, Quantity, Total Revenue
+            row.innerHTML = `
+            <td>${product.productName}</td>
+            <td>${product.color}</td>
+            <td>${product.sizeS}</td>
+            <td>${product.sizeM}</td>
+            <td>${product.sizeL}</td>
+            <td>${product.sizeD}</td>
+            <td>${product.quantitySold}</td>
+            <td>${product.totalRevenue}</td>
+            `;
+
+            // Thêm row vào bảng
+            reportTable.querySelector("tbody").appendChild(row);
+
+            // Cộng dồn doanh thu và đơn hàng
+            totalRevenueAmount += parseFloat(product.totalRevenue);
+            totalOrdersCount += product.quantitySold;
         });
 
-        reportPeriodElem.textContent = `${getMonthName(month)} ${year}`;
-        totalRevenueElem.textContent = `Total Revenue: $${totalRevenue}`;
-        totalOrdersElem.textContent = `Total Orders: ${totalOrders}`;
-      }
+        // Cập nhật tổng doanh thu và tổng số đơn hàng
+        totalRevenue.textContent = `Total Revenue: $${totalRevenueAmount.toFixed(2)}`;
+        totalOrders.textContent = `Total Orders: ${totalOrdersCount}`;
+        } catch (error) {
+        console.error("Error fetching data:", error);
+        }
+    });
+    });
+
 
       function getMonthName(month) {
         const months = {
@@ -333,15 +378,13 @@
           "07": "July",
           "08": "August",
           "09": "September",
-          10: "October",
-          11: "November",
-          12: "December",
+          "10": "October",
+          "11": "November",
+          "12": "December",
         };
         return months[month];
       }
-
-      // Initialize with first store's report
-      document.addEventListener("DOMContentLoaded", updateReport);
+      
     </script>
   </body>
 </html>

@@ -259,6 +259,8 @@ export class ProductService {
           v.product_id AS productID,
           vs.store_id AS storeID,
           v.size,
+          v.origin_price,
+          v.sell_price,
           vc.color,
           vs.quantity
         FROM 
@@ -273,7 +275,16 @@ export class ProductService {
 
       // Group variations by variationID
       const groupedVariations = variations.reduce((acc, curr) => {
-        const { variationID, productID, storeID, size, color, quantity } = curr;
+        const {
+          variationID,
+          productID,
+          storeID,
+          size,
+          origin_price,
+          sell_price,
+          color,
+          quantity,
+        } = curr;
 
         if (!acc[variationID]) {
           acc[variationID] = {
@@ -281,6 +292,8 @@ export class ProductService {
             productID,
             storeID,
             size,
+            origin_price,
+            sell_price,
             colors: [],
           };
         }
