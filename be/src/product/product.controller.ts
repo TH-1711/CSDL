@@ -1,4 +1,12 @@
-import { Controller, Get, Query, ParseIntPipe } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Query,
+  ParseIntPipe,
+  Post,
+  Delete,
+  Body,
+} from "@nestjs/common";
 import { ProductService } from "./product.service";
 
 @Controller("product")
@@ -38,5 +46,57 @@ export class ProductController {
     @Query("productID", ParseIntPipe) productID: number,
   ) {
     return await this.productService.getVariationByProduct(productID);
+  }
+
+  @Get("getProductByID")
+  async getProductByID(@Query("productID", ParseIntPipe) productID: number) {
+    return await this.productService.getProductByID(productID);
+  }
+
+  @Get("getVariationByProductAndStore")
+  async getVariationByProductAndStore(
+    @Query("productID", ParseIntPipe) productID: number,
+    @Query("storeID", ParseIntPipe) storeID: number,
+  ) {
+    return await this.productService.getVariationByProductAndStore(
+      productID,
+      storeID,
+    );
+  }
+
+  @Post("create")
+  async createProduct(
+    @Body()
+    product: {
+      categoryID: number;
+      name: string;
+      description: string;
+      discountForEmployee: number;
+    },
+  ) {
+    const { categoryID, name, description, discountForEmployee } = product;
+    return await this.productService.createProduct(
+      categoryID,
+      name,
+      description,
+      discountForEmployee,
+    );
+  }
+
+  @Post("createVariation")
+  async createVariation(
+    @Body()
+    variation: {
+      productID: number;
+      originPrice: number;
+      size: "S" | "M" | "L" | "D";
+    },
+  ) {
+    const { productID, originPrice, size } = variation;
+    return await this.productService.createVariation(
+      productID,
+      originPrice,
+      size,
+    );
   }
 }

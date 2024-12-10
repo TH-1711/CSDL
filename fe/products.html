@@ -239,6 +239,7 @@
             <option value="7">Trang sức</option>
         </select>
         <button class="add-product-button" onclick="openAddProductModal()">Add Product</button>
+        <button class="add-product-button" onclick="openAddProductVariationModal()">Add Product Variation</button>
     </div>
 
     <br>
@@ -265,14 +266,11 @@
     <div id="addProductModal" class="modal">
         <div class="modal-content">
             <h3>Add New Product</h3>
-            <form id="addProductForm">
-                <label for="productId">Product ID:</label>
-                <input type="text" id="productId" name="productId" required><br><br>
-                <label for="productName">Product Name:</label>
-                <input type="text" id="productName" name="productName" required><br><br>
-                <label for="productDesc">Description:</label>
-                <textarea id="productDesc" name="productDesc" required></textarea><br><br>
-                <label for="productCategory">Category:</label>
+            <form id="addProductForm" onsubmit="return addProduct(event)">
+                <label for="productName">Tên sản phẩm:</label>
+                <input type="text" id="productName" name="productName" required>
+                <br><br>
+                <label for="productCategory">Loại danh mục:</label>
                 <select id="productCategory" name="productCategory" required>
                     <option value="1">Thời trang nam</option>
                     <option value="2">Thời trang nữ</option>
@@ -281,14 +279,46 @@
                     <option value="5">Giày dép</option>
                     <option value="6">Túi và ví</option>
                     <option value="7">Trang sức</option>
-                </select><br><br>
-                <label for="productPrice">Price:</label>
-                <input type="number" id="productPrice" name="productPrice" required><br><br>
+                    <option value="8">Khác</option>
+                </select>
+                <br><br>
+                <label for="productDesc">Mô tả sản phẩm:</label>
+                <textarea id="productDesc" name="productDesc" required></textarea>
+                <br><br>
+                <label for="productEmpDiscount">Chiết khấu cho nhân viên:</label>
+                <input type="number" id="productEmpDiscount" name="productEmpDiscount" required>
+                <br><br>
                 <button type="submit">Add Product</button>
                 <button type="button" onclick="closeAddProductModal()">Cancel</button>
             </form>
         </div>
     </div>
+
+    <div id="addProductVariationModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Product Variation</h3>
+            <form id="addProductVariationForm" onsubmit="return addProductVariation(event)">
+                <label for="productId">Mã sản phẩm:</label>
+                <input type="text" id="productId" name="productId" required>
+                <br><br>
+                <label for="originPrice">Giá gốc:</label>
+                <input type="number" id="originPrice" name="originPrice" required>
+                <br><br>
+                <label for="size">Size:</label>
+                <select id="size" name="size" required>
+                    <option value="S">Nhỏ</option>
+                    <option value="M">Vừa</option>
+                    <option value="L">Lớn</option>
+                    <option value="D">Mặc định</option>
+                </select>
+                <br><br>
+                <button type="submit">Add Variation</button>
+                <button type="button" onclick="closeAddProductVariationModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+
 
     <script src="./script/api.js">
         

@@ -6,6 +6,8 @@ interface Product {
   name: string;
   description: string;
   discount_for_employee: number;
+  catalog_id: number;
+  catalog_name: string;
   store_id: number;
   store_name: string;
 }
@@ -44,6 +46,43 @@ export class ProductService {
     }
   }
 
+  async getProductByID(productID: number) {
+    try {
+      // Validate productID
+      if (!productID || isNaN(productID)) {
+        return {
+          status: "Failed",
+          message: "Error in getProductByID: Invalid product ID.",
+        };
+      }
+      // Fetch product by ID
+      const products = await this.prisma.$queryRaw<Product[]>`
+        SELECT 
+          p.id, p.name, p.description, p.discount_for_employee
+        FROM 
+          product p
+        WHERE 
+          p.id = ${productID}`;
+      // If no products found, throw an error
+      if (!products || products.length === 0) {
+        throw new Error("No products found for this ID.");
+      }
+      // Map the results if necessary (e.g., serialize id)
+      return products.map((product) => ({
+        ...product,
+        id: product.id.toString(),
+        discount_for_employee: product.discount_for_employee.toString(),
+      }))[0];
+    } catch (error) {
+      console.error("Error in getProductByID:", error.message);
+      return {
+        status: "Failed",
+        error: "Failed to fetch product by ID.",
+        message: error.message,
+      };
+    }
+  }
+
   async getProductByCategory(categoryID: number) {
     try {
       // Validate categoryID
@@ -75,6 +114,7 @@ export class ProductService {
         ...product,
         id: product.id.toString(),
         discount_for_employee: product.discount_for_employee.toString(),
+        categoryID: categoryID.toString(),
       }));
     } catch (error) {
       console.error("Error in productByCategory:", error.message);
@@ -153,6 +193,7 @@ export class ProductService {
         id: product.id.toString(),
         store_id: product.store_id.toString(),
         store_name: product.store_name,
+        categoryID: categoryID.toString(),
       }));
     } catch (error) {
       console.error("Error in getProductsByStoreAndCategory:", error);
@@ -204,6 +245,128 @@ export class ProductService {
         status: "Failed",
         error: "Failed to fetch product variations.",
         message: error.message,
+      };
+    }
+  } 
+
+  async getVariationByProductAndStore(productID: number, storeID: number) {
+    try {
+      // Fetch variations with their colors and quantities in the given store
+      const variations = await this.prisma.$queryRaw<any[]>`
+        SELECT 
+          v.id AS variationID,
+          v.product_id AS productID,
+          vs.store_id AS storeID,
+          v.size,
+          v.origin_price,
+          v.sell_price,
+          vc.color,
+          vs.quantity
+        FROM 
+          product_variation v
+        INNER JOIN 
+          variation_in_store vs ON v.id = vs.variation_id
+        INNER JOIN 
+          variation_color vc ON v.id = vc.variation_id AND vc.color = vs.color
+        WHERE 
+          v.product_id = ${productID} AND vs.store_id = ${storeID}
+      `;
+      // Group variations by variationID
+      const groupedVariations = variations.reduce((acc, curr) => {
+        const { variationID, productID, storeID, size, origin_price, sell_price, color, quantity } = curr;
+        if (!acc[variationID]) {
+          acc[variationID] = {
+            variationID,
+            productID,
+            storeID,
+            size,
+            origin_price,
+            sell_price,
+            colors: [],
+          };
+        }
+        acc[variationID].colors.push({ color, quantity });
+        return acc;
+      }, {});
+      // Return as an array
+      return Object.values(groupedVariations);
+    } catch (error) {
+      console.error("Error in getVariationByProductAndStore:", error.message);
+      return {
+        status: "Failed",
+        error: "Failed to fetch variations by product and store.",
+        message: error.message,
+      };
+    }
+  }
+
+  async createProduct(
+    catalogId: number,
+    name: string,
+    description: string,
+    discountForEmployee: number,
+  ) {
+    try {
+      // Sử dụng Prisma để truyền tham số an toàn
+      await this.prisma.$executeRawUnsafe(
+      `
+        CALL AddProduct(?, ?, ?, ?, @new_product_id);
+      `,
+        catalogId,
+        name,
+        description,
+        discountForEmployee,
+      );
+      // Lấy giá trị từ biến session
+      const result = await this.prisma.$queryRaw<Product[]>`
+        SELECT * FROM product WHERE id = (SELECT @new_product_id);
+      `;
+      if (!result || result.length === 0) {
+        return {
+          status: "Failed",
+          message: "Error in addProduct: Product not added.",
+        };
+      }
+      const product = result[0];
+      return {
+        status: "Success",
+        productID: product.id,
+      };
+    } catch (error) {
+      console.error("Error in addProduct:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in addProduct: " + error.message,
+      };
+    }
+  }
+
+  async createVariation(
+    productId: number,
+    originPrice: number,
+    size: "S" | "M" | "L" | "D",
+  ) {
+    try {
+      // Call the stored procedure to insert a product variation
+      await this.prisma.$executeRawUnsafe<any[]>(`
+        CALL insertProductVariation(${productId}, ${originPrice}, '${size}'COLLATE utf8mb4_unicode_ci , @new_variation_id);
+      `);
+      // Fetch the result from the session variable
+      const result = await this.prisma.$queryRaw<ProductVariation>`
+        SELECT * from product_variation WHERE id = @new_variation_id COLLATE utf8mb4_unicode_ci;
+      `;
+      console.log("Result:", result);
+      const variation = result[0];
+      if (!variation || !variation.id) {
+        throw new Error("Failed to retrieve the new variation ID.");
+      }
+
+      return { status: "Success", ...variation };
+    } catch (error) {
+      console.error("Error in insertProductVariation:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in insertProductVariation: " + error.message,
       };
     }
   }

@@ -59,20 +59,22 @@ export class PromotionController {
     @Body()
     body: {
       promotionID: number;
-      productIDs: number[];
+      productID: number;
       discountRate: number;
       useCondition: string;
     },
   ) {
-    const { promotionID, productIDs, discountRate, useCondition } = body;
+    const { promotionID, productID, discountRate, useCondition } = body;
     console.log("input:Promotion ID:", promotionID);
-    console.log("input:Applying promotion to products:", productIDs);
-    if (!promotionID || !productIDs) {
-      return { error: "Invalid input parameters." };
+    console.log("input:Applying promotion to product:", productID);
+
+    if (!promotionID || !productID) {
+      return { status: "Failed", message: "Invalid input parameters." };
     }
+
     return await this.promotionService.applyPromotion(
       promotionID,
-      productIDs,
+      productID,
       discountRate,
       useCondition,
     );
@@ -104,8 +106,7 @@ export class PromotionController {
         start_date?: string;
         end_date?: string;
         discountRate?: number;
-        useCondition?: string;
-      };
+      };  
     },
   ) {
     const { promotionID, updates } = body;

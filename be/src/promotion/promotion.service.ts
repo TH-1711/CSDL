@@ -70,7 +70,7 @@ export class PromotionService {
     try {
       // First, call the stored procedure
       await this.prisma.$executeRawUnsafe(`
-        CALL AddNewPromotion('${content}', '${start_date}', '${end_date}',@new_id);
+        CALL AddNewPromotion('${content}', '${start_date}', '${end_date}', @new_id);
       `);
 
       // Then, fetch the result from the session variable ---> This can be improved by returning only the newID
@@ -79,10 +79,17 @@ export class PromotionService {
       `;
 
       // Return the promotion details including the new ID
-      return result.map((promotion) => ({
-        ...promotion,
-        id: promotion.id.toString(),
-      }));
+      if (result.length > 0) {
+        const promotion = result[0];
+        return {
+          id: promotion.id.toString(),
+          content: promotion.content,
+          start_date: promotion.start_date,
+          end_date: promotion.end_date,
+        };
+      } else {
+        throw new Error("Failed to retrieve the newly created promotion.");
+      }
     } catch (error) {
       console.error("Error creating promotion:", error);
       return {
@@ -94,42 +101,39 @@ export class PromotionService {
 
   async applyPromotion(
     promotionID: number,
-    productIDs: number[],
+    productID: number,
     discountRate: number,
     useCondition: string,
   ) {
-    console.log("Promotion ID:", promotionID);
-    console.log("Applying promotion to products:", productIDs);
-    if (!promotionID || isNaN(promotionID) || productIDs.length === 0) {
+    try{
+      if (!promotionID || isNaN(promotionID) || !productID || isNaN(productID)) {
+        return {
+          status: "Failed",
+          message: "Error applying promotion: Invalid input parameters.",
+        };
+      }
+
+      await this.prisma.$executeRawUnsafe(`
+        CALL ApplyPromotion(${productID}, ${promotionID}, ${discountRate}, '${useCondition}');
+      `);
+
       return {
-        status: "Failed",
-        message: "Error applying promotion: Invalid input parameters.",
+        productID,
+        promotionID,
+        discountRate,
+        useCondition,
+        status: "success",
+        message: `Promotion applied successfully to product ${productID}.`,
+      };
+
+    } catch (error){
+      return {
+        productID,
+        status: "fail",
+        error: `Error applying promotion to product ${productID}:`,
+        message: error.message,
       };
     }
-
-    const results = await Promise.all(
-      productIDs.map(async (productID) => {
-        try {
-          await this.prisma.$executeRawUnsafe(`
-            CALL ApplyPromotion(${productID}, ${promotionID}, ${discountRate}, '${useCondition}');
-          `);
-          return { productID, status: "success" };
-        } catch (error) {
-          console.error(
-            `Error applying promotion to product ${productID}:`,
-            error,
-          );
-          return {
-            productID,
-            status: "fail",
-            error: `Error applying promotion to product ${productID}:`,
-            message: error.message,
-          };
-        }
-      }),
-    );
-
-    return results;
   }
 
   async deletePromotion(promotionID: number) {
@@ -160,7 +164,6 @@ export class PromotionService {
       start_date?: string;
       end_date?: string;
       discountRate?: number;
-      useCondition?: string;
     },
   ) {
     try {
@@ -174,9 +177,6 @@ export class PromotionService {
       }
       if (updates.end_date) {
         updateFields.push(`end_date = '${updates.end_date}'`);
-      }
-      if (updates.useCondition) {
-        updateFields.push(`use_condition = '${updates.useCondition}'`);
       }
 
       if (updateFields.length > 0) {
