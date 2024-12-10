@@ -170,7 +170,9 @@ export class PromotionService {
     },
   ) {
     try {
-      // Begin the dynamic SQL update construction
+      // Begin the dynamic SQL update construction for promotion table
+      console.log("Updating promotion with ID:", promotionID);
+      console.log("Updates:", updates);
       const updateFields: string[] = [];
       if (updates.content) {
         updateFields.push(`content = '${updates.content}'`);
@@ -181,29 +183,41 @@ export class PromotionService {
       if (updates.end_date) {
         updateFields.push(`end_date = '${updates.end_date}'`);
       }
-      if (updates.useCondition) {
-        updateFields.push(`use_condition = '${updates.useCondition}'`);
-      }
 
       if (updateFields.length > 0) {
-        const updateQuery = `
+        const updatePromotionQuery = `
           UPDATE promotion
           SET ${updateFields.join(", ")}
           WHERE id = ${promotionID};
         `;
-        await this.prisma.$executeRawUnsafe(updateQuery);
+        await this.prisma.$executeRawUnsafe(updatePromotionQuery);
       }
 
-      // Call the AdjustDiscountRateForPromotion stored procedure if discountRate is provided
+      // Update promotion_product table
+      const updatePromotionProductFields: string[] = [];
       if (updates.discountRate !== undefined && updates.discountRate !== null) {
-        await this.prisma.$executeRawUnsafe(`
-          CALL AdjustDiscountRateForPromotion(${promotionID}, ${updates.discountRate});
-        `);
+        updatePromotionProductFields.push(
+          `discount_rate = ${updates.discountRate}`,
+        );
+      }
+      if (updates.useCondition) {
+        updatePromotionProductFields.push(
+          `use_condition = '${updates.useCondition}'`,
+        );
+      }
+
+      if (updatePromotionProductFields.length > 0) {
+        const updatePromotionProductQuery = `
+          UPDATE promotion_product
+          SET ${updatePromotionProductFields.join(", ")}
+          WHERE promotion_id = ${promotionID};
+        `;
+        await this.prisma.$executeRawUnsafe(updatePromotionProductQuery);
       }
 
       return {
         status: "Success",
-        message: `Promotion ${promotionID} updated successfully.`,
+        message: `Promotion ${promotionID} and associated promotion_product records updated successfully.`,
       };
     } catch (error) {
       console.error("Error updating promotion:", error);
