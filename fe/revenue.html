@@ -85,6 +85,10 @@
         background: #ff6347;
         color: white;
       }
+      .size-row td {
+        background-color: #e0f7fa !important;
+        border:1px solid #b3e7eb !important;
+      }
 
       .ParameterSelect {
         max-width: 1200px;
@@ -112,7 +116,6 @@
         border-collapse: collapse;
         margin-top: 20px;
       }
-
       th,
       td {
         padding: 10px;
@@ -231,160 +234,172 @@
         </table>
 
         <h3 id="totalRevenue">Total Revenue: $0</h3>
-        <h3 id="totalOrders">Total Orders: 0</h3>
+        
+
       </div>
     </div>
 
     <script>
-    //   function updateReport() {
-    //     const store = document.getElementById("storeSelector").value;
-    //     const month = document.getElementById("monthSelector").value;
-    //     const year = document.getElementById("yearSelector").value;
-
-    //     const reportTableBody = document.getElementById("reportTableBody");
-    //     const totalRevenueElem = document.getElementById("totalRevenue");
-    //     const totalOrdersElem = document.getElementById("totalOrders");
-    //     const reportPeriodElem = document.getElementById("reportPeriod");
-
-    //     const data = reports[store]?.[year]?.[month] || [];
-
-    //     reportTableBody.innerHTML = "";
-    //     let totalRevenue = 0;
-    //     let totalOrders = 0;
-
-    //     data.forEach(({ product, color, size, quantity, revenue }) => {
-    //       const row = document.createElement("tr");
-    //       row.innerHTML = `
-    //                 <td>${product}</td>
-    //                 <td>${color}</td>
-    //                 <td>${size}</td>
-    //                 <td>${quantity}</td>
-    //                 <td>$${revenue}</td>
-    //             `;
-    //       reportTableBody.appendChild(row);
-    //       totalRevenue += revenue;
-    //       totalOrders += quantity;
-    //     });
-
-    //     reportPeriodElem.textContent = `${getMonthName(month)} ${year}`;
-    //     totalRevenueElem.textContent = `Total Revenue: $${totalRevenue}`;
-    //     totalOrdersElem.textContent = `Total Orders: ${totalOrders}`;
-    //   }
-
-    document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
     const storeSelector = document.getElementById("storeSelector");
     const monthSelector = document.getElementById("monthSelector");
     const yearSelector = document.getElementById("yearSelector");
-    const submitBtn = document.getElementById("submitBtn"); // Nút submit mới
+    const submitBtn = document.getElementById("submitBtn");
     const reportTable = document.getElementById("reportTable");
     const reportPeriod = document.getElementById("reportPeriod");
     const totalRevenue = document.getElementById("totalRevenue");
-    const totalOrders = document.getElementById("totalOrders");
+
+    // Thêm dòng mới
+    const highestRevenueProduct = document.createElement("h3");
+    highestRevenueProduct.id = "highestRevenueProduct";
+    highestRevenueProduct.textContent = "Highest Revenue Product: N/A";
+    totalRevenue.parentNode.insertBefore(highestRevenueProduct, totalRevenue.nextSibling);
+
+    const mostSoldProduct = document.createElement("h3");
+    mostSoldProduct.id = "mostSoldProduct";
+    mostSoldProduct.textContent = "Most Sold Product: N/A";
+    highestRevenueProduct.parentNode.insertBefore(mostSoldProduct, highestRevenueProduct.nextSibling);
 
     // Lắng nghe sự kiện bấm nút submit
-    submitBtn.addEventListener("click", async () => {
-        // const storeID = storeSelector.value;
-        let storeID="storeAll";
-        const month = monthSelector.value;
-        const year = yearSelector.value;
+        submitBtn.addEventListener("click", async () => {
+            let storeID = storeSelector.value;
+            const month = monthSelector.value;
+            const year = yearSelector.value;
 
-        // Kiểm tra xem có đủ thông tin để gọi API không
-        const parameter="";
-        console.log("storeID:",storeID);
-        console.log("month:",month);
-        console.log("year:",year);
-        if(storeID!="storeAll") parameter+=`storeID=${storeID}&`;
-        if(month!="monthAll") parameter+=`month=${getMonthName(month)}&`;
-        if(year!="") parameter+=`year=${year}`;
-        if(parameter!="") parameter='?'+parameter;
-        console.log("parameter:",parameter);
-        // URL API
-        const api_url = "http://localhost:3000/api"; // Thay thế với URL của API
-        const url = `${api_url}/revenue/get${parameter}`;
+            let parameter = "";
+            if (storeID != "storeAll") parameter += `storeID=${storeID}&`;
+            if (month != "monthAll") parameter += `month=${month}&`;
+            if (year != "") parameter += `year=${year}`;
+            if (parameter != "") parameter = "?" + parameter;
 
-        try {
-        // Gọi API
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log("data:",data);
+            const api_url = "http://localhost:3000/api"; 
+            const url = `${api_url}/revenue/get${parameter}`;
 
-        // Cập nhật tiêu đề báo cáo
-        textContent = "";
-        if (storeID === "storeAll") {
-            textContent += "Store: All Stores - ";
-        } else {
-            textContent += `Store: ${storeID} - `;
-        }
-        if(month === "monthAll") {
-            textContent += "Month: All Months - ";
-        } else {
-            textContent += `Month: ${getMonthName(month)} - `;
-        }
-        if (year === "") {
-            textContent += "Year: All Years";
-        } else {
-            textContent += `Year: ${year}`;
-        }
-        reportPeriod.textContent = textContent;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                let storeName, monthName, yearName;
+                if (storeID != "storeAll") storeName= storeSelector.options[storeSelector.selectedIndex].text;
+                else storeName= `All Stores`;
+                if (month != "monthAll") monthName = `${month}`;
+                else monthName= `All Months`;
+                if (year != "") yearName= ` - Year: ${year}`;
+                else yearName= `All Years`;
+                reportPeriod.textContent = `Store: ${storeName} - Month: ${monthName} - Year: ${yearName}`;
+                reportTable.querySelector("tbody").innerHTML = ""; 
 
-        // Xóa dữ liệu cũ trong bảng
-        reportTable.querySelector("tbody").innerHTML = "";
+                let totalRevenueAmount = 0;
+                let highestRevenueProductInfo = { name: "N/A", revenue: 0 };
+                let mostSoldProductInfo = { name: "N/A", quantity: 0 };
 
-        let totalRevenueAmount = 0;
-        let totalOrdersCount = 0;
+                data.forEach((product, index) => {
+                    const name = product.name;
+                    const sizes = { S: 0, M: 0, L: 0, D: 0 };
+                    const total_quantity_sold = product.total_quantity_sold;
+                    const totalRevenue = product.totalRevenue;
+                    product.variation.forEach((variation) => {
+                        if (sizes[variation.size] !== undefined) {
+                            sizes[variation.size] = variation.total_quantity_sold;
+                        }
+                    });
 
-        // Lặp qua dữ liệu trả về và hiển thị trong bảng
-        data.forEach(product => {
-            const row = document.createElement("tr");
+                    const productRow = document.createElement("tr");
+                    productRow.classList.add("product-row");
+                    productRow.innerHTML = `
+                        <td>${name}</td>
+                        <td></td>
+                        <td>${sizes.D}</td>
+                        <td>${sizes.M}</td>
+                        <td>${sizes.L}</td>
+                        <td>${sizes.D}</td>
+                        <td>${total_quantity_sold}</td>
+                        <td>${totalRevenue}</td>
+                    `;
+                    productRow.onclick = () => toggleSizeRows(index, product.variation);
+                    reportTable.querySelector("tbody").appendChild(productRow);
 
-            // Tạo các ô cho từng row: Product, Size, Color, Quantity, Total Revenue
-            row.innerHTML = `
-            <td>${product.productName}</td>
-            <td>${product.color}</td>
-            <td>${product.sizeS}</td>
-            <td>${product.sizeM}</td>
-            <td>${product.sizeL}</td>
-            <td>${product.sizeD}</td>
-            <td>${product.quantitySold}</td>
-            <td>${product.totalRevenue}</td>
-            `;
+                    product.variation.forEach((variation, sizeIndex) => {
+                        let sizeRow = document.createElement("tr");
+                        sizeRow.classList.add("size-row", `product-${index}`);
+                        sizeRow.style.display = "none";
+                        sizeRow.style.backgroundColor = "#5c46d7";
+                        const colors = variation.colors.map(c => c.color).join(", ");
+                        sizeRow.innerHTML = `
+                            <td></td>
+                            <td>${colors}</td>
+                            <td>${variation.size === "S" ? "✔" : ""}</td>
+                            <td>${variation.size === "M" ? "✔" : ""}</td>
+                            <td>${variation.size === "L" ? "✔" : ""}</td>
+                            <td>${variation.size === "D" ? "✔" : ""}</td>
+                            <td>${variation.total_quantity_sold}</td>
+                            <td>${variation.totalRevenue}</td>
+                        `;
+                        reportTable.querySelector("tbody").appendChild(sizeRow);
+                    });
 
-            // Thêm row vào bảng
-            reportTable.querySelector("tbody").appendChild(row);
+                    totalRevenueAmount += parseFloat(totalRevenue);
 
-            // Cộng dồn doanh thu và đơn hàng
-            totalRevenueAmount += parseFloat(product.totalRevenue);
-            totalOrdersCount += product.quantitySold;
+                    if (totalRevenue > highestRevenueProductInfo.revenue) {
+                        highestRevenueProductInfo = { name, revenue: totalRevenue };
+                    }
+
+                    if (total_quantity_sold > mostSoldProductInfo.quantity) {
+                        mostSoldProductInfo = { name, quantity: total_quantity_sold };
+                    }
+                });
+
+                totalRevenue.textContent = `Total Revenue: $${totalRevenueAmount.toFixed(2)}`;
+                highestRevenueProduct.textContent = `Highest Revenue Product: ${highestRevenueProductInfo.name} - $${highestRevenueProductInfo.revenue.toFixed(2)}`;
+                mostSoldProduct.textContent = `Most Sold Product: ${mostSoldProductInfo.name} - ${mostSoldProductInfo.quantity} units`;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         });
 
-        // Cập nhật tổng doanh thu và tổng số đơn hàng
-        totalRevenue.textContent = `Total Revenue: $${totalRevenueAmount.toFixed(2)}`;
-        totalOrders.textContent = `Total Orders: ${totalOrdersCount}`;
-        } catch (error) {
-        console.error("Error fetching data:", error);
+        function toggleSizeRows(productIndex, variations) {
+            document.querySelectorAll(`.size-row.product-${productIndex}`).forEach(row => {
+                row.style.display = row.style.display === "none" ? "table-row" : "none";
+                row.style.backgroundColor = row.style.display === "none" ? "" : "#5c46d7";
+            });
+        }    
+    });
+
+        document.addEventListener("DOMContentLoaded", async function () {
+        const storeSelector = document.getElementById("storeSelector");
+
+        // Hàm fetch dữ liệu từ API /store/listStore
+        async function fetchStores() {
+            try {
+                const response = await fetch("http://localhost:3000/api/store/storeList");
+                if (!response.ok) {
+                    console.log("Failed to load stores:", response);
+                }
+                const stores = await response.json();
+                storeSelector.innerHTML = "";
+                console.log("stores: ",stores);
+
+                // Thêm tùy chọn mặc định
+                const defaultOption = document.createElement("option");
+                defaultOption.value = "storeAll";
+                defaultOption.textContent = "All";
+                storeSelector.appendChild(defaultOption);
+
+                // Thêm các tùy chọn từ dữ liệu API
+                stores.forEach((store) => {
+                    const option = document.createElement("option");
+                    option.value = store.id;
+                    option.textContent = store.name;
+                    storeSelector.appendChild(option);
+                });
+            } catch (error) {
+                console.log("Error loading stores:", error);
+                
+            }
         }
-    });
-    });
 
-
-      function getMonthName(month) {
-        const months = {
-          "01": "January",
-          "02": "February",
-          "03": "March",
-          "04": "April",
-          "05": "May",
-          "06": "June",
-          "07": "July",
-          "08": "August",
-          "09": "September",
-          "10": "October",
-          "11": "November",
-          "12": "December",
-        };
-        return months[month];
-      }
-      
-    </script>
+        // Gọi hàm fetch khi tải trang
+        await fetchStores();
+    });
+        </script>
   </body>
 </html>

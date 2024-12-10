@@ -92,10 +92,15 @@ export class RevenueService {
           existingProduct = {
             id: productID,
             name: productName,
+            total_quantity_sold: 0,
+            totalRevenue: 0, // Initialize product totalRevenue
             variation: [],
           };
           acc.push(existingProduct);
         }
+
+        // Update total quantity sold for the product
+        existingProduct.total_quantity_sold += parseInt(totalQuantitySold, 10);
 
         // Find existing variation
         let existingVariation = existingProduct.variation.find(
@@ -104,27 +109,32 @@ export class RevenueService {
         if (!existingVariation) {
           existingVariation = {
             size: size,
-            sold_price: sold_price,
+            sold_price: parseFloat(sold_price),
             total_quantity_sold: 0,
+            totalRevenue: 0, // Initialize variation totalRevenue
             colors: [],
           };
           existingProduct.variation.push(existingVariation);
         }
 
-        // Update total quantity sold for the variation
-        existingVariation.total_quantity_sold += parseInt(
-          totalQuantitySold,
-          10,
-        );
+        // Update total quantity sold and revenue for the variation
+        const quantitySold = parseInt(totalQuantitySold, 10);
+        existingVariation.total_quantity_sold += quantitySold;
+        existingVariation.totalRevenue +=
+          quantitySold * existingVariation.sold_price;
+
+        // Update product totalRevenue
+        existingProduct.totalRevenue +=
+          quantitySold * existingVariation.sold_price;
 
         // Add or update color
         const existingColor = existingVariation.colors.find(
           (col) => col.color === color,
         );
         if (existingColor) {
-          existingColor.quantity += totalQuantitySold;
+          existingColor.quantity += quantitySold;
         } else {
-          existingVariation.colors.push({ color, quantity: totalQuantitySold });
+          existingVariation.colors.push({ color, quantity: quantitySold });
         }
 
         return acc;

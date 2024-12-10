@@ -316,18 +316,25 @@ export class ProductService {
   }
 
   async createProduct(
-    catalogId: number,
+    catalogID: number,
     name: string,
     description: string,
     discountForEmployee: number,
   ) {
     try {
       // Sử dụng Prisma để truyền tham số an toàn
+      console.log(
+        "Creating product:",
+        catalogID,
+        name,
+        description,
+        discountForEmployee,
+      );
       await this.prisma.$executeRawUnsafe(
         `
         CALL AddProduct(?, ?, ?, ?, @new_product_id);
       `,
-        catalogId,
+        catalogID,
         name,
         description,
         discountForEmployee,
