@@ -16,4 +16,11 @@ export class CategoryController {
   ) {
     return this.categoryService.productCountByCategory(categoryID);
   }
+
+  @Get("getCategoryByProduct")
+  async getCategoryByProduct(
+    @Query("productID", ParseIntPipe) productID: number,
+  ) {
+    return this.categoryService.getCategoryByProduct(productID);
+  }
 }

@@ -129,6 +129,39 @@
         .button:hover {
             background: #0056b3;
         }
+        #showPromotionList {
+  max-width: 100%;
+  margin: 20px auto;
+  overflow-x: auto; /* Để xử lý khi nội dung vượt quá chiều rộng */
+}
+
+#showPromotionList table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#showPromotionList th, #showPromotionList td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd; /* Viền cho các ô */
+}
+
+#showPromotionList th {
+  background-color: #ff6347; /* Màu nền giống report table */
+  color: #ffffff; /* Màu chữ */
+}
+
+#showPromotionList td {
+  background-color: #f9f9f9; /* Màu nền của các ô */
+}
+
+@media (max-width: 768px) {
+  #showPromotionList table {
+    font-size: 14px; /* Giảm kích thước chữ cho thiết bị nhỏ */
+  }
+}
+
 
         .promo-summary {
             margin-top: 20px;
@@ -209,6 +242,9 @@
         <div class="toggle-options">
             <button id="createDiscountBtn" class="active" onclick="showCreateDiscount()">Create Discount</button>
             <button id="applyDiscountBtn" onclick="showApplyDiscount()">Apply Discount</button>
+            <button id="updateDiscountBtn" onclick="showUpdatePromotion()">Update Promotion</button>
+            <button id="deleteDiscountBtn" onclick="showDeletePromotion()">Delete Promotion</button>
+            <button id="showPromotionListBtn" onclick="showPromotionList()">Promotion List</button>
         </div>
 
         <div id="createDiscountForm">
@@ -233,11 +269,11 @@
                 <button type="button" class="button" onclick="createDiscount()">Create Discount</button>
 
             <div class="promo-summary" id="promoSummary" style="display: none;">
-                <h3>Discount Details</h3>
-                <p><strong>Code:</strong> <span id="summaryCode"></span></p>
-                <p><strong>Discount:</strong> <span id="summaryDiscount"></span>%</p>
-                <p><strong>Applicable Products:</strong> <span id="summaryProducts"></span></p>
-                <p><strong>Description:</strong> <span id="summaryDescription"></span></p>
+                <h3>Tạo khuyến mãi thành công</h3>
+                <p><strong>Mã khuyến mãi:</strong> <span id="summaryCode"></span></p>
+                <p><strong>Nội dung:</strong> <span id="summaryDescription"></span></p>
+                <p><strong>Ngày bắt đầu:</strong> <span id="summaryStartDate"></span></p>
+                <p><strong>Ngày hết hạn:</strong> <span id="summaryEndDate"></span></p>        
             </div>
         </div>
 
@@ -255,81 +291,73 @@
                     <label for="discount">Mức giảm giá (%)</label>
                     <input type="number" id="discount" min="1" max="100" required>
                 </div>
+                <div class="form-group">
+                    <label for="condition">Điều kiện áp dụng</label>
+                    <input type="text" id="condition">
+                </div>
                 <button type="button" class="button" onclick="applyDiscount()">Apply Discount</button>
             </form>
-        
             <div class="promo-summary" id="applySummary" style="display: none;">
-                <h3>Applied Discount Details</h3>
-                <p><strong>Code:</strong> <span id="applySummaryCode"></span></p>
-                <p><strong>Product ID:</strong> <span id="applySummaryProduct"></span></p>
-                <p><strong>Status:</strong> Valid!</p>
+                <h3>Áp dụng khuyến mãi thành công</h3>
+                <p><strong>Mã khuyến mãi:</strong> <span id="applySummaryCode"></span></p>
+                <p><strong>Mã sản phẩm:</strong> <span id="applySummaryProduct"></span></p>
+                <p><strong>Mức giảm:</strong> <span id="applySummaryDiscount"></span>%</p>
+                <p><strong>Điều kiện áp dụng:</strong> <span id="applySummaryCondition"></span></p>
             </div>
         </div>
-        
+
+        <div id="updatePromotionForm" style="display: none;">
+            <form id="updateForm">
+                <div class="form-group">
+                    <label for="updatePromotionID">Promotion ID</label>
+                    <input type="number" id="updatePromotionID" required>
+                </div>
+                <div class="form-group">
+                    <label for="updateContent">Content</label>
+                    <input type="text" id="updateContent">
+                </div>
+                <div class="form-group">
+                    <label for="updateStartDate">Start Date</label>
+                    <input type="date" id="updateStartDate">
+                </div>
+                <div class="form-group">
+                    <label for="updateEndDate">End Date</label>
+                    <input type="date" id="updateEndDate">
+                </div>
+                <div class="form-group">
+                    <label for="updateDiscountRate">Discount Rate (%)</label>
+                    <input type="number" id="updateDiscountRate" min="1" max="100">
+                </div>
+                <button type="button" class="button" onclick="updatePromotion()">Update Promotion</button>
+            </form>
+        </div>
+
+        <div id="deletePromotionForm" style="display: none;">
+            <form id="deleteForm">
+                <div class="form-group">
+                    <label for="deletePromotionID">Mã khuyến mãi</label>
+                    <input type="number" id="deletePromotionID" required>
+                </div>
+                <button type="button" class="button" onclick="deletePromotion()">Thu hồi</button>
+            </form>
+        </div>
+        <div id="showPromotionList" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã khuyến mãi</th>
+                        <th>Nội dung</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày hết hạn</th>
+                    </tr>
+                </thead>
+                <tbody id="promotionList">
+                </tbody>
+
+        </div>
     </div>
 
-    <script>
-
-        function createDiscount() {
-            // Get input values
-            const contentPromo = document.getElementById('contentPromo').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-
-            // Validate inputs
-            if (!contentPromo || !startDate || !endDate) {
-            alert("Please fill out all fields.");
-            return;
-            }
-
-            // Simulate creating the discount (you can replace this with an API call)
-            console.log("Creating discount:", { contentPromo, startDate, endDate });
-
-            // Update the summary
-            const promoSummary = document.getElementById('promoSummary');
-            promoSummary.style.display = 'block';
-            document.getElementById('summaryCode').textContent = contentPromo;
-            document.getElementById('summaryDiscount').textContent = "TBD"; // Add discount value if available
-            document.getElementById('summaryProducts').textContent = "TBD"; // Add applicable products if available
-            document.getElementById('summaryDescription').textContent = `Valid from ${startDate} to ${endDate}`;
-
-            // Clear form inputs
-            document.getElementById('contentPromo').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-
-            alert("Discount created successfully!");
-        }
-
-        function showCreateDiscount() {
-            document.getElementById("createDiscountForm").style.display = "block";
-            // document.getElementById("applyDiscountForm").style.display = "none";
-
-            document.getElementById("createDiscountBtn").classList.add("active");
-            // document.getElementById("applyDiscountBtn").classList.remove("active");
-        }        
-
-        function showApplyDiscount() {
-            document.getElementById("applyDiscountForm").style.display = "block";
-            document.getElementById("createDiscountForm").style.display = "none";
-
-            document.getElementById("applyDiscountBtn").classList.add("active");
-            document.getElementById("createDiscountBtn").classList.remove("active");
-        }
-        
-        function applyDiscount() {
-            const applyCode = document.getElementById("applyCode").value;
-            const productId = document.getElementById("productId").value;
-
-            // Thực hiện kiểm tra hợp lệ hoặc các logic khác tại đây
-            if (applyCode && productId) {
-                document.getElementById("applySummary").style.display = "block";
-                document.getElementById("applySummaryCode").textContent = applyCode;
-                document.getElementById("applySummaryProduct").textContent = productId;
-            } else {
-                alert("Please enter both Discount Code and Product ID.");
-            }
-        }
-
+    <script src="./script/promotion.js">
+            
     </script>
 </body>

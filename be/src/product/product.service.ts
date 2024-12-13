@@ -19,6 +19,7 @@ interface ProductVariation {
   size: string;
   product_id: number;
   colors: string | string[] | null;
+  quantity: number;
 }
 
 @Injectable()
@@ -208,38 +209,54 @@ export class ProductService {
 
   async getVariationByProduct(productID: number) {
     try {
-      // Fetch product variations along with their associated colors
-      const variations = await this.prisma.$queryRaw<ProductVariation[]>`
+      // Fetch product variations along with color-specific quantities
+      const variations = await this.prisma.$queryRaw<any>`
         SELECT 
-          pv.id, 
-          pv.origin_price, 
-          pv.sell_price, 
-          pv.size, 
-          pv.product_id, 
-          GROUP_CONCAT(vc.color) AS colors
+          pv.id AS variation_id,
+          pv.origin_price,
+          pv.sell_price,
+          pv.size,
+          pv.product_id,
+          vc.color,
+          SUM(vs.quantity) AS color_quantity
         FROM 
           product_variation pv
         LEFT JOIN 
           variation_color vc ON pv.id = vc.variation_id
+        LEFT JOIN 
+          variation_in_store vs ON pv.id = vs.variation_id
         WHERE 
           pv.product_id = ${productID}
         GROUP BY 
-          pv.id, pv.origin_price, pv.sell_price, pv.size, pv.product_id`;
+          pv.id, vc.color, pv.origin_price, pv.sell_price, pv.size, pv.product_id;
+      `;
 
-      // Transform data
-      return variations.map((variation) => ({
-        ...variation,
-        id: variation.id.toString(),
-        origin_price: variation.origin_price,
-        sell_price: variation.sell_price,
-        size: variation.size,
-        product_id: variation.product_id.toString(),
-        colors: Array.isArray(variation.colors)
-          ? variation.colors
-          : variation.colors
-            ? variation.colors.split(",")
-            : [],
-      }));
+      // Transform data into the required structure
+      const result = variations.reduce((acc, row) => {
+        const variation = acc.find((v) => v.id === row.variation_id);
+
+        const colorTuple = {
+          color: row.color,
+          quantity: row.color_quantity || 0,
+        };
+
+        if (variation) {
+          variation.colors.push(colorTuple);
+        } else {
+          acc.push({
+            id: row.variation_id.toString(),
+            origin_price: row.origin_price,
+            sell_price: row.sell_price,
+            size: row.size,
+            product_id: row.product_id.toString(),
+            colors: row.color ? [colorTuple] : [], // Add initial color if available
+          });
+        }
+
+        return acc;
+      }, []);
+
+      return result;
     } catch (error) {
       console.error("Error in getVariationByProductID:", error.message);
       return {
@@ -394,6 +411,170 @@ export class ProductService {
       return {
         status: "Failed",
         message: "Error in insertProductVariation: " + error.message,
+      };
+    }
+  }
+
+  async updateProduct(
+    productID: number,
+    updates: {
+      name?: string;
+      description?: string;
+      discountForEmployee?: number;
+      catalogID?: number;
+    },
+  ) {
+    try {
+      // Validate productID
+      if (!productID || isNaN(productID)) {
+        return {
+          status: "Failed",
+          message: "Error in updateProduct: Invalid product ID.",
+        };
+      }
+      const catalogID = updates.catalogID;
+      // Build the update query except for catalogID
+      if (updates.catalogID !== undefined) {
+        delete updates.catalogID;
+      }
+      const updateFields = Object.entries(updates)
+        .map(([key, value]) => {
+          if (value === undefined) return "";
+          return `${key} = ${typeof value === "string" ? `'${value}'` : value}`;
+        })
+        .filter((field) => field)
+        .join(", ");
+
+      // Update the product
+      await this.prisma.$executeRawUnsafe(
+        `
+        UPDATE product
+        SET ${updateFields}
+        WHERE id = ${productID};
+      `,
+      );
+      if (catalogID !== undefined) {
+        await this.prisma.$executeRawUnsafe(
+          `
+          UPDATE product_in_catalog
+          SET catalog_id = ${catalogID}
+          WHERE product_id = ${productID};
+        `,
+        );
+      }
+      return { status: "Success" };
+    } catch (error) {
+      console.error("Error in updateProduct:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in updateProduct: " + error.message,
+      };
+    }
+  }
+
+  async updateVariation(
+    productVariationID: number,
+    updates: {
+      originPrice?: number;
+      sellPrice?: number;
+      size?: "S" | "M" | "L" | "D";
+    },
+  ) {
+    try {
+      // Validate productVariationID
+      if (!productVariationID || isNaN(productVariationID)) {
+        return {
+          status: "Failed",
+          message: "Error in updateVariation: Invalid product variation ID.",
+        };
+      }
+
+      // Build the update query
+      const updateFields = Object.entries(updates)
+        .map(([key, value]) => {
+          if (value === undefined) return "";
+          return `${key} = ${typeof value === "string" ? `'${value}'` : value}`;
+        })
+        .filter((field) => field)
+        .join(", ");
+
+      // Update the product variation
+      await this.prisma.$executeRawUnsafe(
+        `
+        UPDATE product_variation
+        SET ${updateFields}
+        WHERE id = ${productVariationID};
+      `,
+      );
+
+      return { status: "Success" };
+    } catch (error) {
+      console.error("Error in updateVariation:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in updateVariation: " + error.message,
+      };
+    }
+  }
+
+  async deleteProduct(productID: number) {
+    try {
+      // Validate productID
+      if (!productID || isNaN(productID)) {
+        return {
+          status: "Failed",
+          message: "Error in deleteProduct: Invalid product ID.",
+        };
+      }
+
+      // Delete the product
+      await this.prisma.$executeRawUnsafe(
+        `
+        UPDATE product
+        SET active = FALSE
+        WHERE id = ${productID};
+
+      `,
+      );
+
+      return { status: "Success" };
+    } catch (error) {
+      console.error("Error in deleteProduct:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in deleteProduct: " + error.message,
+      };
+    }
+  }
+
+  async getProductStatus(productID) {
+    try {
+      // Validate productID
+      if (!productID || isNaN(productID)) {
+        return {
+          status: "Failed",
+          message: "Error in getProductStatus: Invalid product ID.",
+        };
+      }
+
+      // Fetch product status
+      const result = await this.prisma.$queryRaw<any[]>`
+        SELECT active FROM product WHERE id = ${productID};
+      `;
+
+      if (!result || result.length === 0) {
+        return {
+          status: "Failed",
+          message: "Error in getProductStatus: Product not found.",
+        };
+      }
+
+      return { status: "Success", active: result[0].active };
+    } catch (error) {
+      console.error("Error in getProductStatus:", error.message);
+      return {
+        status: "Failed",
+        message: "Error in getProductStatus: " + error.message,
       };
     }
   }

@@ -100,42 +100,38 @@ export class PromotionService {
 
   async applyPromotion(
     promotionID: number,
-    productIDs: number[],
+    productID: number,
     discountRate: number,
     useCondition: string,
   ) {
     console.log("Promotion ID:", promotionID);
-    console.log("Applying promotion to products:", productIDs);
-    if (!promotionID || isNaN(promotionID) || productIDs.length === 0) {
+    console.log("Applying promotion to products:", productID);
+    if (!promotionID || isNaN(promotionID) || !productID || isNaN(productID)) {
       return {
         status: "Failed",
         message: "Error applying promotion: Invalid input parameters.",
       };
     }
-
-    const results = await Promise.all(
-      productIDs.map(async (productID) => {
-        try {
-          await this.prisma.$executeRawUnsafe(`
-            CALL ApplyPromotion(${productID}, ${promotionID}, ${discountRate}, '${useCondition}');
-          `);
-          return { productID, status: "success" };
-        } catch (error) {
-          console.error(
-            `Error applying promotion to product ${productID}:`,
-            error,
-          );
-          return {
-            productID,
-            status: "fail",
-            error: `Error applying promotion to product ${productID}:`,
-            message: error.message,
-          };
-        }
-      }),
-    );
-
-    return results;
+    let productName: string;
+    try {
+      const productResult = await this.prisma.$queryRaw<any>`
+        SELECT name FROM product WHERE id = ${productID};
+      `;
+      productName = productResult[0]?.name || "Unknown Product";
+      await this.prisma.$executeRawUnsafe(`
+        CALL ApplyPromotion(${productID}, ${promotionID}, ${discountRate}, '${useCondition}');
+      `);
+      return { productID, productName, status: "Success" };
+    } catch (error) {
+      console.error(`Error applying promotion to product ${productID}:`, error);
+      return {
+        productID,
+        productName,
+        status: "Failed",
+        error: `Error applying promotion to product ${productID}: ${error}`,
+        message: error.message,
+      };
+    }
   }
 
   async deletePromotion(promotionID: number) {

@@ -82,10 +82,13 @@ function openModal(productId, name, description, discount) {
   // Show the modal
   document.getElementById("productModal").style.display = "flex";
 
-  // Fetch variations for the product
-  fetch(
-    `http://localhost:3000/api/product/getVariationByProduct?productID=${productId}`
-  )
+  const storeID = document.getElementById("storeSelect").value;
+  const apiUrl =
+    storeID === "all"
+      ? `http://localhost:3000/api/product/getVariationByProduct?productID=${productId}`
+      : `http://localhost:3000/api/product/getVariationByProductAndStore?productID=${productId}&storeID=${storeID}`;
+
+  fetch(apiUrl)
     .then((response) => {
       if (!response.ok) {
         throw new Error(
@@ -95,7 +98,6 @@ function openModal(productId, name, description, discount) {
       return response.json();
     })
     .then((variations) => {
-      // Populate the modal with sizes and prices
       const sizesContainer = document.querySelector(".variant.sizes");
       const colorsContainer = document.querySelector(".variant.colors");
 
@@ -103,7 +105,6 @@ function openModal(productId, name, description, discount) {
       sizesContainer.innerHTML = "";
       colorsContainer.innerHTML = "";
 
-      // Populate sizes with clickable functionality
       variations.forEach((variation) => {
         const sizeElement = document.createElement("span");
         sizeElement.className = "size";
@@ -118,12 +119,28 @@ function openModal(productId, name, description, discount) {
           sizeElement.classList.add("selected");
 
           // Display colors for the selected size
-          colorsContainer.innerHTML = `
-                        <strong>Màu hiện có:</strong> 
-                        ${variation.colors
-                          .map((color) => `<span class="color">${color}</span>`)
-                          .join("")}
-                    `;
+          if (storeID === "all") {
+            // If storeID is "all", just display colors without quantity
+            colorsContainer.innerHTML = `
+                            <strong>Màu hiện có:</strong> 
+                            ${variation.colors
+                              .map(
+                                (color) => `<span class="color">${color}</span>`
+                              )
+                              .join("")}
+                        `;
+          } else {
+            // If a specific store is selected, display colors with quantities
+            colorsContainer.innerHTML = `
+                            <strong>Màu hiện có:</strong> 
+                            ${variation.colors
+                              .map(
+                                (color) =>
+                                  `<span class="color">${color.color} (${color.quantity} chiếc)</span>`
+                              )
+                              .join("")}
+                        `;
+          }
 
           // Display prices for the selected size
           document.getElementById("modalPrice").innerHTML = `
@@ -138,7 +155,6 @@ function openModal(productId, name, description, discount) {
         sizesContainer.appendChild(sizeElement);
       });
 
-      // Initial state: Display no colors or prices
       colorsContainer.innerHTML =
         "<strong>Click a size to view available colors</strong>";
     })
@@ -147,7 +163,6 @@ function openModal(productId, name, description, discount) {
       alert("Failed to load product variations. Please try again.");
     });
 
-  // Show the modal
   document.getElementById("productModal").style.display = "flex";
 }
 
@@ -160,6 +175,127 @@ function openAddProductModal() {
 }
 function closeAddProductModal() {
   document.getElementById("addProductModal").style.display = "none";
+}
+
+function openAddProductVariationModal() {
+  document.getElementById("addProductVariationModal").style.display = "block";
+}
+
+function closeAddProductVariationModal() {
+  document.getElementById("addProductVariationModal").style.display = "none";
+}
+
+async function addProduct(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("productName").value;
+  const categoryID = parseInt(
+    document.getElementById("productCategory").value,
+    10
+  );
+  const description = document.getElementById("productDesc").value;
+  const discountForEmployee = parseInt(
+    document.getElementById("productEmpDiscount").value,
+    10
+  );
+
+  const requestBody = {
+    categoryID,
+    name,
+    description,
+    discountForEmployee,
+  };
+
+  try {
+    // Send a POST request to the API
+    const response = await fetch(`${baseUrl}/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    // Check for a successful response
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(`Error: ${errorResponse.message}`);
+    }
+
+    // Parse the JSON response
+    const result = await response.json();
+    alert(`Thêm sản phẩm thành công: mã sản phẩm --> ${result.productID}`);
+
+    // Optionally refresh the product list
+    fetchProducts();
+
+    // Close the modal
+    closeAddProductModal();
+  } catch (error) {
+    console.error("Error adding product:", error);
+    alert("Failed to add product. Please try again.");
+  }
+}
+
+async function addProductVariation(event) {
+  event.preventDefault();
+
+  const productID = parseInt(document.getElementById("productId").value, 10);
+  const originPrice = parseFloat(document.getElementById("originPrice").value);
+  const size = document.getElementById("size").value;
+
+  const requestBody = {
+    productID,
+    originPrice,
+    size,
+  };
+
+  try {
+    const response = await fetch(`${baseUrl}/createVariation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(`Error: ${errorResponse.message}`);
+    }
+
+    const result = await response.json();
+    console.log(result);
+
+    const errorSameVariation =
+      "A variation with the same size already exists for this product.";
+    const errorInconsistVariation1 =
+      "Cannot add default size (D) because specific size variations already exist";
+    const errorInconsistVariation2 =
+      "Cannot add size S because a default size (D) variation already exists";
+
+    if (result.status === "Failed") {
+      if (result.message.includes(errorSameVariation)) {
+        alert(`Sản phẩm này đã có size ${size}`);
+      } else if (result.message.includes(errorInconsistVariation1)) {
+        alert(
+          `Sản phẩm này đã có size cụ thể nên không thể thêm size mặc định (D)`
+        );
+      } else if (result.message.includes(errorInconsistVariation2)) {
+        alert(
+          `Sản phẩm này đã có size mặc định (D) nên không thể thêm size cụ thể`
+        );
+      } else {
+        alert(result.message);
+      }
+    } else {
+      alert(`Thêm biến thể sản phẩm thành công: mã biến thể --> ${result.id}`);
+      closeAddProductVariationModal();
+    }
+  } catch (error) {
+    console.error("Error adding product variation:", error);
+    alert("Failed to add product variation. Please try again.");
+  }
 }
 
 // Call the displayProducts function when the page loads

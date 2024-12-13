@@ -6,6 +6,7 @@ import {
   Post,
   Delete,
   Body,
+  Put,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 
@@ -98,5 +99,36 @@ export class ProductController {
       originPrice,
       size,
     );
+  }
+
+  @Put("update")
+  async updateProduct(
+    productID: number,
+    updates: {
+      categoryID: number;
+      name: string;
+      description: string;
+      discountForEmployee: number;
+    },
+  ) {
+    return await this.productService.updateProduct(productID, updates);
+  }
+
+  @Put("updateVariation")
+  async updateVariation(productVariationID: number, updates: {}) {
+    return await this.productService.updateVariation(
+      productVariationID,
+      updates,
+    );
+  }
+
+  @Put("delete")
+  async deleteProduct(@Query("productID", ParseIntPipe) productID: number) {
+    return await this.productService.deleteProduct(productID);
+  }
+
+  @Get("getProductStatus")
+  async getProductStatus(@Query("productID", ParseIntPipe) productID: number) {
+    return await this.productService.getProductStatus(productID);
   }
 }

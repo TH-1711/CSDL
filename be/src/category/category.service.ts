@@ -56,4 +56,34 @@ export class CategoryService {
       };
     }
   }
+
+  async getCategoryByProduct(productID: number) {
+    try {
+      console.log("Input ID:", productID); // Log the input to verify it's passed correctly
+
+      const result = await this.categoryService.$queryRaw<
+        Category[]
+      >`SELECT * FROM catalog WHERE id = (SELECT catalog_id FROM product WHERE id = ${productID})`;
+
+      if (result.length > 0) {
+        return result.map((category) => ({
+          ...category,
+          id: category.id.toString(), // Convert id to string for serialization
+        }))[0];
+      } else {
+        return {
+          status: "Failed",
+          error: "Category not found.",
+          message: "Error in getCategoryByProduct: Category not found.",
+        };
+      }
+    } catch (error) {
+      console.error("Error in getCategoryByProduct:", error);
+      return {
+        status: "Failed",
+        error: "Failed to fetch category by product.",
+        message: "Error in getCategoryByProduct.",
+      };
+    }
+  }
 }
